@@ -283,7 +283,7 @@
                             <input type="url" id="site-url" placeholder="https://tuosito.com"
                                 class="w-full bg-black border border-zinc-700 text-white rounded-xl px-4 py-3.5 text-base outline-none focus:border-brandCyan transition-colors">
                         </div>
-                        <button onclick="generateDemo()" class="w-full bg-brandCyan text-black font-black py-4 rounded-xl text-xs hover:bg-cyan-400 transition uppercase tracking-widest active:scale-95">
+                        <button onclick="()" class="w-full bg-brandCyan text-black font-black py-4 rounded-xl text-xs hover:bg-cyan-400 transition uppercase tracking-widest active:scale-95">
                             Genera Demo Live →
                         </button>
                     </div>
@@ -925,57 +925,57 @@
 
     /* Demo generator */
         async function generateDemo() {
-        const urlRaw = document.getElementById('site-url').value.trim();
-        if (!urlRaw) { document.getElementById('site-url').focus(); return; }
+    const urlRaw = document.getElementById('site-url').value.trim();
+    if (!urlRaw) { document.getElementById('site-url').focus(); return; }
+
+    /* Forza il protocollo corretto */
+    let url = urlRaw;
+    if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+
+    const botId = 'demo_' + Math.random().toString(36).slice(2, 9);
     
-        /* Forza il protocollo corretto */
-        let url = urlRaw;
-        if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+    // Riferimenti grafici del bottone
+    const submitBtn = document.querySelector('#demo button');
+    const originalText = submitBtn.textContent;
     
-        const botId = 'demo_' + Math.random().toString(36).slice(2, 9);
+    // Disabilita pulsante e mostra lo stato di analisi
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Analisi e addestramento AI (può richiedere 15s)...';
+
+    try {
+        // Chiamata diretta a n8n senza alcun timeout restrittivo lato browser
+        const res = await fetch('https://n8n.rmstudio.app/webhook/chatbot-creator', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                site_url: url,
+                bot_id: botId,
+                nome_struttura: 'Demo Client',
+                is_paid: false // Impostato su false per la demo gratuita (1 pagina)
+            })
+        });
         
-        // Riferimenti grafici del bottone
-        const submitBtn = document.querySelector('#demo button');
-        const originalText = submitBtn.textContent;
+        const data = await res.json();
         
-        // Disabilita pulsante e mostra caricamento neuroscienza (Effetto Sforzo/Valore)
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Analisi e addestramento AI (10s)...';
-    
-        try {
-            const res = await fetch('https://n8n.rmstudio.app/webhook/chatbot-creator', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    site_url: url,
-                    bot_id: botId,
-                    nome_struttura: 'Demo Client',
-                    is_paid: false // Impostato su false per la demo gratuita (1 pagina)
-                }),
-                signal: AbortSignal.timeout(20000) // Timeout di sicurezza a 20 secondi
-            });
+        if (data.success && data.demo_url) {
+            const linkEl = document.getElementById('demo-link');
+            const resultDiv = document.getElementById('demo-result');
             
-            const data = await res.json();
-            
-            if (data.success && data.demo_url) {
-                const linkEl = document.getElementById('demo-link');
-                const resultDiv = document.getElementById('demo-result');
-                
-                linkEl.href = data.demo_url;
-                linkEl.textContent = data.demo_url;
-                resultDiv.classList.remove('hidden');
-            } else {
-                alert("Errore nell'analisi del sito. Riprova tra qualche istante.");
-            }
-        } catch(e) {
-            console.error(e);
-            alert("Errore di rete durante la generazione della demo. Verifica la connessione.");
-        } finally {
-            // Ripristina il pulsante
-            submitBtn.disabled = false;
-            submitBtn.textContent = originalText;
+            linkEl.href = data.demo_url;
+            linkEl.textContent = data.demo_url;
+            resultDiv.classList.remove('hidden');
+        } else {
+            alert("Errore nell'analisi del sito. Riprova tra qualche istante.");
         }
+    } catch(e) {
+        console.error(e);
+        alert("Il server sta completando l'analisi. Se il link non compare, attendi 5 secondi e riprova.");
+    } finally {
+        // Ripristina il pulsante
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
     }
+}
 
     /* Live counter */
     (function () {
