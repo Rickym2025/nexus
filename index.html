@@ -38,16 +38,23 @@
         .animated-glow-border {
             animation: border-pulse 6s infinite ease-in-out;
         }
+        /* Forza l'accelerazione hardware della scheda video per rendere il background fluidissimo */
+        video {
+            transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
+            perspective: 1000px;
+            will-change: transform;
+        }
     </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col justify-between overflow-x-hidden">
 
-    <!-- Sfondo Video Fluido -->
+    <!-- Sfondo Video Fluido con Accelerazione GPU -->
     <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
         <video autoplay loop muted playsinline preload="auto" class="w-full h-full object-cover opacity-25">
             <source src="background.mp4" type="video/mp4">
         </video>
-        <div class="absolute inset-0 bg-gradient-to-b from-darkBg/90 via-darkBg/50 to-darkBg" />
+        <div class="absolute inset-0 bg-gradient-to-b from-darkBg/95 via-darkBg/50 to-darkBg" />
     </div>
 
     <!-- Navbar -->
@@ -77,7 +84,7 @@
             </span>
 
             <h1 class="text-4xl md:text-6xl font-black tracking-tight leading-tight mb-6">
-                Il 98% dei tuoi visitatori esce.< <br>
+                Il 98% dei tuoi visitatori esce.<br>
                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-brandCyan via-blue-500 to-brandPurple">
                     Inizia a vendere parlando.
                 </span>
@@ -218,7 +225,7 @@
                 <p class="text-xs text-zinc-500 mb-16 uppercase tracking-widest font-bold">Meno del costo di un caffè al giorno per automatizzare la tua reception</p>
                 
                 <div class="grid md:grid-cols-2 gap-8 max-w-2xl mx-auto text-left">
-                    <!-- Standard Plan (Anchoring target) -->
+                    <!-- Standard Plan -->
                     <div class="p-8 glass-panel rounded-3xl relative border border-brandCyan/20">
                         <span class="absolute top-0 right-6 -translate-y-1/2 bg-brandCyan text-black text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-wider">Scelta Intelligente</span>
                         <h3 class="text-lg font-bold text-white mb-1">Standard Plan</h3>
@@ -238,7 +245,7 @@
                         </button>
                     </div>
 
-                    <!-- Custom / Enterprise (Anchoring price point contrast) -->
+                    <!-- Custom / Enterprise -->
                     <div class="p-8 glass-panel rounded-3xl opacity-75">
                         <h3 class="text-lg font-bold text-white mb-1">Custom Hub</h3>
                         <p class="text-xs text-zinc-400 mb-6">Ecosistemi complessi con integrazioni CRM.</p>
@@ -392,7 +399,7 @@
         <div id="nx-window" class="animated-glow-border">
             <div class="nx-header">
                 <div style="display:flex;align-items:center;gap:12px;">
-                    <img src="logo_nexus_bg.png" style="width:30px;height:30px;object-contain;" alt="NexusAI">
+                    <img src="logo_nexus_bg.png" style="width:30px;height:30px;object-fit: contain;" alt="NexusAI">
                     <div style="display:flex;flex-direction:column;">
                         <span style="font-size:14px;line-height:1.2;font-weight:800;letter-spacing:1px;">NexusAI Pilot</span>
                         <span style="font-size:10px;color:var(--green-glow);font-weight:normal;">● Attivo ed online</span>
@@ -409,13 +416,15 @@
             </div>
             <div class="nx-input-area">
                 <input type="text" id="nx-input" placeholder="Chiedimi come funziona..." onkeypress="if(event.key==='Enter') sendNxMsg()">
-                <button onclick="sendNxMsg()">Chiedi</button>
+                <button id="nx-send-btn">Chiedi</button>
             </div>
         </div>
         `;
 
+        // Collega gli eventi solo DOPO aver iniettato il codice HTML nel container
         document.getElementById('nx-bubble').addEventListener('click', toggleNxChat);
         document.getElementById('nx-close-btn').addEventListener('click', toggleNxChat);
+        document.getElementById('nx-send-btn').addEventListener('click', sendNxMsg);
 
         // Allineamento stato iniziale
         document.getElementById('nx-window').style.display = chatIsOpen ? 'flex' : 'none';
