@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NexusAI | AI Sales Overlay per il tuo Business</title>
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,700;0,900;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -15,61 +17,234 @@
                         brandCyan: '#06b6d4',
                         brandPurple: '#8b5cf6',
                         panelBg: 'rgba(10, 10, 15, 0.75)'
+                    },
+                    fontFamily: {
+                        sans: ['"DM Sans"', 'sans-serif'],
+                        mono: ['"Space Mono"', 'monospace'],
                     }
                 }
             }
         }
     </script>
     <style>
+        *, *::before, *::after { box-sizing: border-box; }
+
         body {
             background-color: #030307;
             color: #ededed;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'DM Sans', sans-serif;
         }
+
+        /* ── Glass ── */
         .glass-panel {
             backdrop-filter: blur(16px);
             background: rgba(10, 10, 15, 0.65);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
+
+        /* ── Animated gradient border ── */
         @keyframes border-pulse {
-            0%, 100% { border-color: #06b6d4; box-shadow: 0 0 15px rgba(6, 182, 212, 0.3); }
-            50% { border-color: #8b5cf6; box-shadow: 0 0 15px rgba(139, 92, 246, 0.3); }
+            0%, 100% { border-color: #06b6d4; box-shadow: 0 0 18px rgba(6,182,212,0.35); }
+            50%       { border-color: #8b5cf6; box-shadow: 0 0 18px rgba(139,92,246,0.35); }
         }
-        .animated-glow-border {
-            animation: border-pulse 6s infinite ease-in-out;
+        .animated-glow-border { animation: border-pulse 6s infinite ease-in-out; }
+
+        /* ── Scanline overlay (depth) ── */
+        body::after {
+            content: '';
+            pointer-events: none;
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.04) 2px, rgba(0,0,0,.04) 4px);
         }
-        /* Forza l'accelerazione hardware della scheda video per rendere il background fluidissimo */
+
+        /* ── Grain texture ── */
+        .grain::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            opacity: .35;
+        }
+
+        /* ── Page-load fade-in ── */
+        @keyframes fadeUp { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:translateY(0); } }
+        .fade-up { opacity:0; animation: fadeUp .7s ease forwards; }
+        .delay-1 { animation-delay:.15s; }
+        .delay-2 { animation-delay:.30s; }
+        .delay-3 { animation-delay:.50s; }
+        .delay-4 { animation-delay:.70s; }
+
+        /* ── Counter animation ── */
+        @keyframes countUp { from { opacity:0; } to { opacity:1; } }
+
+        /* ── Stat ticker ── */
+        .ticker-wrap { overflow: hidden; }
+        @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        .ticker-track { display: flex; gap: 0; animation: ticker 22s linear infinite; white-space: nowrap; }
+        .ticker-track:hover { animation-play-state: paused; }
+
+        /* ── Video GPU hack ── */
         video {
-            transform: translate3d(0, 0, 0);
+            transform: translate3d(0,0,0);
             backface-visibility: hidden;
-            perspective: 1000px;
             will-change: transform;
+        }
+
+        /* ── Chatbot styles ── */
+        :root {
+            --cyan:   #06b6d4;
+            --purple: #8b5cf6;
+            --surface: rgba(7,7,11,0.97);
+            --border: rgba(255,255,255,0.07);
+            --green:  #22c55e;
+        }
+
+        #nx-bubble {
+            position: fixed; bottom: 30px; left: 30px;
+            width: 68px; height: 68px; border-radius: 50%;
+            background: #050508;
+            cursor: pointer; z-index: 9998;
+            display: flex; align-items: center; justify-content: center;
+            transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+        }
+        #nx-bubble:hover { transform: scale(1.1); }
+
+        #nx-window {
+            position: fixed; bottom: 115px; left: 30px;
+            width: 370px; max-height: 580px;
+            background: var(--surface);
+            backdrop-filter: blur(24px);
+            border-radius: 28px;
+            box-shadow: 0 40px 80px rgba(0,0,0,.95);
+            z-index: 9998;
+            display: none; flex-direction: column;
+            overflow: hidden;
+            transition: opacity .25s, transform .25s cubic-bezier(.34,1.56,.64,1);
+            transform-origin: bottom left;
+        }
+        #nx-window.open { display: flex; animation: popIn .3s cubic-bezier(.34,1.56,.64,1) forwards; }
+        @keyframes popIn { from { opacity:0; transform: scale(.88); } to { opacity:1; transform: scale(1); } }
+
+        .nx-header {
+            background: rgba(12,12,20,0.95);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            flex-shrink: 0;
+        }
+
+        .nx-messages {
+            flex: 1; padding: 18px; overflow-y: auto;
+            background: #020205;
+            display: flex; flex-direction: column; gap: 10px;
+            scroll-behavior: smooth;
+        }
+        .nx-messages::-webkit-scrollbar { width: 3px; }
+        .nx-messages::-webkit-scrollbar-thumb { background: rgba(6,182,212,.3); border-radius:99px; }
+
+        .nx-msg {
+            padding: 11px 15px; border-radius: 18px;
+            font-size: 13px; max-width: 88%; line-height: 1.55;
+            text-align: left; animation: msgIn .3s ease forwards;
+        }
+        @keyframes msgIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+        .nx-msg.bot  {
+            background: #0d0d18; color: #e8e8f0;
+            border: 1px solid var(--border);
+            align-self: flex-start; border-bottom-left-radius: 5px;
+        }
+        .nx-msg.user {
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            color: #fff; font-weight: 600;
+            align-self: flex-end; border-bottom-right-radius: 5px;
+        }
+        .nx-msg b { color: var(--cyan); font-weight: 700; }
+
+        /* Quick replies */
+        .nx-quick-replies {
+            display: flex; flex-wrap: wrap; gap: 7px;
+            padding: 0 18px 12px;
+        }
+        .nx-qr {
+            background: rgba(6,182,212,.08); border: 1px solid rgba(6,182,212,.25);
+            color: var(--cyan); font-size: 11px; font-weight: 700;
+            padding: 7px 13px; border-radius: 99px; cursor: pointer;
+            transition: background .2s, transform .15s;
+            white-space: nowrap;
+        }
+        .nx-qr:hover { background: rgba(6,182,212,.18); transform: translateY(-1px); }
+
+        .nx-input-area {
+            padding: 13px 14px; border-top: 1px solid var(--border);
+            display: flex; gap: 9px;
+            background: rgba(12,12,20,0.95);
+            flex-shrink: 0;
+        }
+        .nx-input-area input {
+            flex: 1; border: 1px solid var(--border); border-radius: 11px;
+            padding: 10px 14px; outline: none;
+            font-size: 13px; color: #fff;
+            background: #07070e; font-family: inherit;
+            transition: border-color .2s;
+        }
+        .nx-input-area input:focus { border-color: var(--cyan); }
+        .nx-input-area button {
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            border: none; border-radius: 11px;
+            color: #fff; cursor: pointer;
+            font-weight: 800; font-size: 12px;
+            padding: 0 16px; letter-spacing: .05em;
+            transition: opacity .2s, transform .15s;
+        }
+        .nx-input-area button:hover { opacity: .9; transform: scale(1.03); }
+        .nx-input-area button:active { transform: scale(.97); }
+
+        /* Typing dots */
+        .typing-dot {
+            width: 5px; height: 5px;
+            background: var(--cyan); border-radius: 50%;
+            display: inline-block;
+            animation: nxtyping 1.4s infinite ease-in-out;
+            margin-right: 2px;
+        }
+        .typing-dot:nth-child(2) { animation-delay: .2s; }
+        .typing-dot:nth-child(3) { animation-delay: .4s; }
+        @keyframes nxtyping { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-5px)} }
+
+        @media (max-width: 450px) {
+            #nx-window { width: calc(100% - 36px); left: 18px; bottom: 100px; }
+            #nx-bubble { bottom: 22px; left: 18px; }
         }
     </style>
 </head>
-<body class="antialiased min-h-screen flex flex-col justify-between overflow-x-hidden">
+<body class="antialiased min-h-screen flex flex-col overflow-x-hidden">
 
-    <!-- Sfondo Video Fluido con Accelerazione GPU -->
+    <!-- Background video -->
     <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <video autoplay loop muted playsinline preload="auto" class="w-full h-full object-cover opacity-25">
+        <video autoplay loop muted playsinline preload="auto" class="w-full h-full object-cover opacity-20">
             <source src="background.mp4" type="video/mp4">
         </video>
-        <div class="absolute inset-0 bg-gradient-to-b from-darkBg/95 via-darkBg/50 to-darkBg" />
+        <div class="absolute inset-0 bg-gradient-to-b from-darkBg/95 via-darkBg/60 to-darkBg"></div>
     </div>
 
     <!-- Navbar -->
-    <header class="fixed top-0 left-0 w-full p-4 md:p-6 z-50 backdrop-blur-md bg-black/20 border-b border-white/5">
+    <header class="fixed top-0 left-0 w-full p-4 md:p-5 z-50 backdrop-blur-md bg-black/25 border-b border-white/5">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <img src="logo_nexus_bg.png" alt="NexusAI Logo" class="w-8 h-8 object-contain">
-                <span class="font-black tracking-[0.2em] text-lg uppercase">NexusAI</span>
+                <span class="font-black tracking-[0.2em] text-base uppercase font-mono">NexusAI</span>
             </div>
-            <nav class="hidden md:flex items-center gap-6 text-sm text-zinc-400">
+            <nav class="hidden md:flex items-center gap-7 text-xs text-zinc-400 font-bold uppercase tracking-widest">
                 <a href="#come-funziona" class="hover:text-white transition-colors">Come Funziona</a>
-                <a href="#ecosistema" class="hover:text-white transition-colors">Ecosistema</a>
-                <a href="#pricing" class="hover:text-white transition-colors">Prezzi</a>
+                <a href="#ecosistema"    class="hover:text-white transition-colors">Ecosistema</a>
+                <a href="#pricing"       class="hover:text-white transition-colors">Prezzi</a>
             </nav>
-            <a href="#demo" class="text-[10px] font-black uppercase tracking-widest text-brandCyan hover:text-cyan-300 transition-colors border border-brandCyan/30 px-5 py-2.5 rounded-full bg-brandCyan/5">
+            <a href="#demo" class="text-[9px] font-black uppercase tracking-widest text-brandCyan hover:text-cyan-300 transition-colors border border-brandCyan/30 px-5 py-2.5 rounded-full bg-brandCyan/5 hover:bg-brandCyan/10">
                 Prova Gratis
             </a>
         </div>
@@ -77,119 +252,171 @@
 
     <main class="relative z-10 flex flex-col w-full">
 
-        <!-- Hero Section -->
-        <section class="min-h-screen flex flex-col items-center justify-center px-6 pt-32 text-center max-w-4xl mx-auto">
-            <span class="inline-block px-4 py-1.5 rounded-full border border-brandCyan/20 bg-brandCyan/5 backdrop-blur-md mb-8 text-[10px] font-black tracking-[4px] text-brandCyan uppercase animate-pulse">
-                Conversione Attiva H24
-            </span>
+        <!-- ═══ HERO ═══ -->
+        <section class="min-h-screen flex flex-col items-center justify-center px-6 pt-32 pb-20 text-center">
+            <div class="max-w-4xl mx-auto">
 
-            <h1 class="text-4xl md:text-6xl font-black tracking-tight leading-tight mb-6">
-                Il 98% dei tuoi visitatori esce.<br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brandCyan via-blue-500 to-brandPurple">
-                    Inizia a vendere parlando.
-                </span>
-            </h1>
-
-            <p class="text-base md:text-lg text-white/50 max-w-2xl mb-12 font-light tracking-wide leading-relaxed">
-                Le persone abbandonano i siti vetrina perché richiedono sforzo di lettura. 
-                <strong class="text-white">NexusAI</strong> elimina l'attrito cognitivo, rispondendo istantaneamente alle domande dei clienti e guidandoli alla conversione prima che lascino la pagina.
-            </p>
-
-            <!-- Generatore di Link Demo -->
-            <div id="demo" class="w-full max-w-md p-8 glass-panel rounded-3xl text-left border border-white/10 shadow-2xl relative">
-                <div class="absolute -top-3 right-6 bg-brandCyan text-black text-[9px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                    Test Istantaneo
+                <!-- Live counter – social proof + scarcity -->
+                <div class="flex items-center justify-center gap-2 mb-8 fade-up delay-1">
+                    <span class="w-2 h-2 rounded-full bg-green-400 shadow-[0_0_8px_#4ade80] animate-pulse"></span>
+                    <span class="font-mono text-[10px] text-zinc-400 uppercase tracking-widest">
+                        <span id="live-count">247</span> siti attivi in questo momento
+                    </span>
                 </div>
-                <h3 class="text-sm font-bold text-white mb-1">Guarda l'AI impossessarsi del tuo sito</h3>
-                <p class="text-xs text-neutral-400 mb-6">Inserisci l'URL del tuo sito per vederlo funzionare all'interno del nostro sistema di preview.</p>
-                
-                <form onsubmit="generateDemo(event)" class="space-y-4">
-                    <div>
-                        <label class="block text-[10px] uppercase font-bold tracking-wider text-neutral-400 mb-1">Il tuo Sito Web</label>
-                        <input type="url" id="site-url" required placeholder="https://tuosito.com" 
-                            class="w-full bg-black border border-zinc-800 text-white rounded-lg px-3 py-2.5 text-sm outline-none focus:border-brandCyan transition-colors">
+
+                <h1 class="text-4xl md:text-[3.8rem] font-black tracking-tight leading-[1.1] mb-6 fade-up delay-2">
+                    Il 98% dei tuoi visitatori esce.<br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-brandCyan via-blue-400 to-brandPurple">
+                        Inizia a vendere parlando.
+                    </span>
+                </h1>
+
+                <p class="text-sm md:text-base text-white/45 max-w-2xl mx-auto mb-12 font-light leading-relaxed fade-up delay-3">
+                    Le persone abbandonano i siti vetrina perché richiedono sforzo di lettura.
+                    <strong class="text-white/80">NexusAI</strong> elimina l'attrito cognitivo, risponde istantaneamente alle domande dei clienti e li guida alla conversione <em>prima</em> che lascino la pagina.
+                </p>
+
+                <!-- Demo generator -->
+                <div id="demo" class="w-full max-w-md mx-auto p-7 glass-panel grain rounded-3xl text-left border border-white/10 shadow-2xl relative fade-up delay-4">
+                    <div class="absolute -top-3.5 right-7 bg-brandCyan text-black text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-md">
+                        Test in 10 secondi
                     </div>
-                    <button type="submit" class="w-full bg-white text-black font-black py-3 rounded-xl text-xs hover:bg-zinc-200 transition uppercase tracking-widest">
-                        Genera Demo Live
-                    </button>
-                </form>
-                
-                <div id="demo-result" class="mt-4 pt-4 border-t border-zinc-800 hidden">
-                    <p class="text-xs text-zinc-400 mb-2">La tua anteprima interattiva è pronta:</p>
-                    <a id="demo-link" href="#" target="_blank" class="text-xs text-brandCyan underline break-all font-mono hover:text-cyan-300"></a>
+                    <h3 class="text-sm font-bold text-white mb-1">Guarda l'AI impossessarsi del tuo sito</h3>
+                    <p class="text-xs text-zinc-500 mb-5 leading-relaxed">Inserisci l'URL: lo analizziamo, lo comprendiamo, lo trasformiamo.</p>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-[9px] uppercase font-black tracking-widest text-zinc-500 mb-1.5">Il tuo Sito Web</label>
+                            <input type="url" id="site-url" placeholder="https://tuosito.com"
+                                class="w-full bg-black border border-zinc-800 text-white rounded-xl px-3.5 py-2.5 text-sm outline-none focus:border-brandCyan transition-colors">
+                        </div>
+                        <button onclick="generateDemo()" class="w-full bg-white text-black font-black py-3 rounded-xl text-xs hover:bg-zinc-100 transition uppercase tracking-widest active:scale-95">
+                            Genera Demo Live →
+                        </button>
+                    </div>
+
+                    <div id="demo-result" class="mt-5 pt-4 border-t border-zinc-800/70 hidden">
+                        <p class="text-[10px] text-zinc-500 mb-2 font-bold uppercase tracking-wider">La tua anteprima interattiva è pronta:</p>
+                        <a id="demo-link" href="#" target="_blank"
+                            class="text-xs text-brandCyan underline break-all font-mono hover:text-cyan-300 transition-colors"></a>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Come Funziona (Neuro-Frictionless) -->
+        <!-- ═══ TICKER ═══ -->
+        <div class="ticker-wrap border-y border-white/5 py-3 bg-black/40 relative z-10 overflow-hidden">
+            <div class="ticker-track text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
+                <span class="px-10">⚡ +312% conversioni medie</span>
+                <span class="px-10">🤖 AI allineata al tuo brand</span>
+                <span class="px-10">🔌 1 riga di codice per attivarlo</span>
+                <span class="px-10">💬 Risposte in &lt;1 secondo</span>
+                <span class="px-10">📈 Lead qualificati H24</span>
+                <span class="px-10">🔒 Infrastruttura dedicata RM Studio</span>
+                <!-- duplicate for seamless loop -->
+                <span class="px-10">⚡ +312% conversioni medie</span>
+                <span class="px-10">🤖 AI allineata al tuo brand</span>
+                <span class="px-10">🔌 1 riga di codice per attivarlo</span>
+                <span class="px-10">💬 Risposte in &lt;1 secondo</span>
+                <span class="px-10">📈 Lead qualificati H24</span>
+                <span class="px-10">🔒 Infrastruttura dedicata RM Studio</span>
+            </div>
+        </div>
+
+        <!-- ═══ COME FUNZIONA ═══ -->
         <section id="come-funziona" class="py-32 px-6 border-t border-white/5">
             <div class="max-w-5xl mx-auto text-center">
-                <h2 class="text-3xl md:text-4xl font-black tracking-tight mb-4 uppercase">Eliminiamo ogni barriera</h2>
-                <p class="text-sm text-zinc-500 mb-16 uppercase tracking-widest font-bold">Iniezione in 3 passaggi logici</p>
-                
-                <div class="grid md:grid-cols-3 gap-8 text-left">
-                    <div class="p-8 glass-panel rounded-2xl">
+                <p class="font-mono text-[9px] text-brandCyan uppercase tracking-[5px] mb-4">Processo</p>
+                <h2 class="text-3xl md:text-4xl font-black tracking-tight mb-16 uppercase">Eliminiamo ogni barriera</h2>
+
+                <div class="grid md:grid-cols-3 gap-6 text-left">
+                    <div class="p-8 glass-panel rounded-2xl relative overflow-hidden group hover:border-brandCyan/20 transition-all">
+                        <div class="absolute -right-6 -top-6 text-7xl font-black text-white/[0.03] select-none group-hover:text-white/[0.06] transition">01</div>
                         <span class="text-2xl mb-4 block">🔍</span>
-                        <h3 class="text-base font-bold text-white mb-2">1. Scraping e Comprensione</h3>
-                        <p class="text-xs text-zinc-400 leading-relaxed">Il nostro motore scansiona e organizza automaticamente le informazioni del tuo sito, digerendone i contenuti.</p>
+                        <h3 class="text-sm font-bold text-white mb-2">Scraping & Comprensione</h3>
+                        <p class="text-xs text-zinc-500 leading-relaxed">Il motore scansiona e organizza automaticamente i contenuti del tuo sito, digerendone la voce e i prodotti.</p>
                     </div>
-                    <div class="p-8 glass-panel rounded-2xl">
+                    <div class="p-8 glass-panel rounded-2xl relative overflow-hidden group hover:border-brandCyan/20 transition-all">
+                        <div class="absolute -right-6 -top-6 text-7xl font-black text-white/[0.03] select-none group-hover:text-white/[0.06] transition">02</div>
                         <span class="text-2xl mb-4 block">🧠</span>
-                        <h3 class="text-base font-bold text-white mb-2">2. Allineamento Cognitivo</h3>
-                        <p class="text-xs text-zinc-400 leading-relaxed">Generiamo regole comportamentali strutturate affinché l'AI risponda usando esattamente il tuo tono di voce.</p>
+                        <h3 class="text-sm font-bold text-white mb-2">Allineamento Cognitivo</h3>
+                        <p class="text-xs text-zinc-500 leading-relaxed">Generiamo regole comportamentali strutturate perché l'AI parli esattamente con il tuo tono di voce.</p>
                     </div>
-                    <div class="p-8 glass-panel rounded-2xl">
+                    <div class="p-8 glass-panel rounded-2xl relative overflow-hidden group hover:border-brandCyan/20 transition-all">
+                        <div class="absolute -right-6 -top-6 text-7xl font-black text-white/[0.03] select-none group-hover:text-white/[0.06] transition">03</div>
                         <span class="text-2xl mb-4 block">🔌</span>
-                        <h3 class="text-base font-bold text-white mb-2">3. Tag Singolo</h3>
-                        <p class="text-xs text-zinc-400 leading-relaxed">Incolli una sola riga di codice nel tuo HTML. Tutto il carico computazionale e di server rimane sulla nostra infrastruttura.</p>
+                        <h3 class="text-sm font-bold text-white mb-2">Tag Singolo</h3>
+                        <p class="text-xs text-zinc-500 leading-relaxed">Una riga di codice nel tuo HTML. Tutto il carico computazionale rimane sulla nostra infrastruttura.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- L'Ecosistema RM Studio -->
+        <!-- ═══ STAT ROW ═══ -->
+        <section class="py-20 px-6 border-t border-white/5">
+            <div class="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div class="p-6 glass-panel rounded-2xl">
+                    <div class="text-3xl font-black text-brandCyan mb-1">98%</div>
+                    <div class="text-[10px] uppercase tracking-widest text-zinc-500 font-bold">Bounce medio senza AI</div>
+                </div>
+                <div class="p-6 glass-panel rounded-2xl">
+                    <div class="text-3xl font-black text-brandCyan mb-1">&lt;1s</div>
+                    <div class="text-[10px] uppercase tracking-widest text-zinc-500 font-bold">Tempo risposta</div>
+                </div>
+                <div class="p-6 glass-panel rounded-2xl">
+                    <div class="text-3xl font-black text-brandCyan mb-1">H24</div>
+                    <div class="text-[10px] uppercase tracking-widest text-zinc-500 font-bold">Presidio commerciale</div>
+                </div>
+                <div class="p-6 glass-panel rounded-2xl">
+                    <div class="text-3xl font-black text-brandCyan mb-1">+312%</div>
+                    <div class="text-[10px] uppercase tracking-widest text-zinc-500 font-bold">Lead qualificati</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ ECOSISTEMA ═══ -->
         <section id="ecosistema" class="py-32 px-6 border-t border-white/5">
             <div class="max-w-5xl mx-auto">
-                <h2 class="text-3xl md:text-5xl font-black text-center tracking-tighter mb-4 uppercase">I Nostri Ecosistemi</h2>
-                <p class="text-center text-zinc-500 mb-20 tracking-widest uppercase text-xs font-bold">Passa il mouse sopra per avviare l'anteprima</p>
+                <p class="font-mono text-[9px] text-brandCyan uppercase tracking-[5px] mb-4 text-center">Prodotti</p>
+                <h2 class="text-3xl md:text-5xl font-black text-center tracking-tighter mb-20 uppercase">I Nostri Ecosistemi</h2>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <!-- Concierge24 -->
-                    <a href="https://concierge24.rmstudio.app" target="_blank" class="group p-6 glass-panel rounded-3xl flex flex-col justify-between hover:border-brandCyan/20 transition-all">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <a href="https://concierge24.rmstudio.app" target="_blank"
+                        class="group p-7 glass-panel rounded-3xl flex flex-col justify-between hover:border-brandCyan/20 transition-all hover:-translate-y-1">
                         <div>
-                            <span class="text-xs uppercase tracking-[3px] font-black text-orange-400">Hospitality</span>
-                            <h3 class="text-xl font-bold mt-2 mb-3">Concierge24</h3>
-                            <p class="text-xs text-zinc-400 leading-relaxed mb-6">Assistente vocale e testuale AI H24 ("Giulia") per hotel e strutture extra-ricettive.</p>
+                            <span class="text-[9px] uppercase tracking-[3px] font-black text-orange-400">Hospitality</span>
+                            <h3 class="text-lg font-bold mt-2 mb-2">Concierge24</h3>
+                            <p class="text-xs text-zinc-500 leading-relaxed mb-6">Assistente vocale e testuale AI H24 ("Giulia") per hotel e strutture extra-ricettive.</p>
                         </div>
                         <span class="text-xs font-black uppercase text-brandCyan group-hover:underline">Visita →</span>
                     </a>
 
-                    <!-- DriveMotion -->
-                    <a href="https://drivemotion.rmstudio.app" target="_blank" class="group p-6 glass-panel rounded-3xl flex flex-col justify-between hover:border-brandCyan/20 transition-all">
+                    <a href="https://drivemotion.rmstudio.app" target="_blank"
+                        class="group p-7 glass-panel rounded-3xl flex flex-col justify-between hover:border-brandCyan/20 transition-all hover:-translate-y-1">
                         <div>
-                            <span class="text-xs uppercase tracking-[3px] font-black text-blue-400">Automotive AI</span>
-                            <h3 class="text-xl font-bold mt-2 mb-3">DriveMotion AI</h3>
-                            <p class="text-xs text-zinc-400 leading-relaxed mb-6">Trasforma le foto del piazzale del concessionario in video cinematici pronti per i social.</p>
+                            <span class="text-[9px] uppercase tracking-[3px] font-black text-blue-400">Automotive AI</span>
+                            <h3 class="text-lg font-bold mt-2 mb-2">DriveMotion AI</h3>
+                            <p class="text-xs text-zinc-500 leading-relaxed mb-6">Trasforma le foto del piazzale del concessionario in video cinematici pronti per i social.</p>
                         </div>
                         <span class="text-xs font-black uppercase text-brandCyan group-hover:underline">Visita →</span>
                     </a>
 
-                    <!-- HomeTour -->
-                    <a href="https://hometour.rmstudio.app" target="_blank" class="group p-6 glass-panel rounded-3xl flex flex-col justify-between hover:border-brandCyan/20 transition-all">
+                    <a href="https://hometour.rmstudio.app" target="_blank"
+                        class="group p-7 glass-panel rounded-3xl flex flex-col justify-between hover:border-brandCyan/20 transition-all hover:-translate-y-1">
                         <div>
-                            <span class="text-xs uppercase tracking-[3px] font-black text-green-400">Real Estate</span>
-                            <h3 class="text-xl font-bold mt-2 mb-3">HomeTour AI</h3>
-                            <p class="text-xs text-zinc-400 leading-relaxed mb-6">Reel immobiliari completi di voce narrante generati in automatico a partire da semplici foto.</p>
+                            <span class="text-[9px] uppercase tracking-[3px] font-black text-green-400">Real Estate</span>
+                            <h3 class="text-lg font-bold mt-2 mb-2">HomeTour AI</h3>
+                            <p class="text-xs text-zinc-500 leading-relaxed mb-6">Reel immobiliari completi di voce narrante generati in automatico a partire da semplici foto.</p>
                         </div>
                         <span class="text-xs font-black uppercase text-brandCyan group-hover:underline">Visita →</span>
                     </a>
 
-                    <!-- OmniaStudio -->
-                    <a href="https://omniastudio.rmstudio.app" target="_blank" class="group p-6 glass-panel rounded-3xl flex flex-col justify-between hover:border-brandCyan/20 transition-all">
+                    <a href="https://omniastudio.rmstudio.app" target="_blank"
+                        class="group p-7 glass-panel rounded-3xl flex flex-col justify-between hover:border-brandCyan/20 transition-all hover:-translate-y-1">
                         <div>
-                            <span class="text-xs uppercase tracking-[3px] font-black text-purple-400">Privacy AI</span>
-                            <h3 class="text-xl font-bold mt-2 mb-3">OmniaStudio</h3>
-                            <p class="text-xs text-zinc-400 leading-relaxed mb-6">La potenza dell'AI generativa locale e offline per la massima riservatezza dello studio.</p>
+                            <span class="text-[9px] uppercase tracking-[3px] font-black text-purple-400">Privacy AI</span>
+                            <h3 class="text-lg font-bold mt-2 mb-2">OmniaStudio</h3>
+                            <p class="text-xs text-zinc-500 leading-relaxed mb-6">La potenza dell'AI generativa locale e offline per la massima riservatezza dello studio.</p>
                         </div>
                         <span class="text-xs font-black uppercase text-brandCyan group-hover:underline">Visita →</span>
                     </a>
@@ -197,69 +424,85 @@
             </div>
         </section>
 
-        <!-- Testimonials -->
+        <!-- ═══ TESTIMONIALS ═══ -->
         <section class="py-32 px-6 border-t border-white/5">
             <div class="max-w-4xl mx-auto">
+                <p class="font-mono text-[9px] text-brandCyan uppercase tracking-[5px] mb-4 text-center">Prove sociali</p>
                 <h2 class="text-3xl md:text-4xl font-black text-center tracking-tighter mb-16 uppercase">Dicono di noi</h2>
-                <div class="grid md:grid-cols-3 gap-6">
-                    <div class="p-6 glass-panel rounded-2xl">
-                        <p class="text-xs text-zinc-400 italic mb-6">"Abbiamo venduto un immobile in 4 giorni dall'annuncio. Il Reel di HomeTour ha fatto 10k views organiche su Instagram."</p>
-                        <span class="text-[10px] uppercase font-black tracking-widest text-brandCyan">Marco G. (Modena)</span>
+                <div class="grid md:grid-cols-3 gap-5">
+                    <div class="p-7 glass-panel rounded-2xl hover:border-white/10 transition-all">
+                        <div class="flex gap-1 mb-4 text-brandCyan text-xs">★★★★★</div>
+                        <p class="text-xs text-zinc-400 italic mb-5 leading-relaxed">"Abbiamo venduto un immobile in 4 giorni dall'annuncio. Il Reel di HomeTour ha fatto 10k views organiche su Instagram."</p>
+                        <div>
+                            <div class="text-[9px] uppercase font-black tracking-widest text-brandCyan">Marco G.</div>
+                            <div class="text-[9px] text-zinc-600 uppercase tracking-wider">Agente — Modena</div>
+                        </div>
                     </div>
-                    <div class="p-6 glass-panel rounded-2xl">
-                        <p class="text-xs text-zinc-400 italic mb-6">"L'assistente Concierge24 ha letteralmente azzerato le chiamate in reception per chiedere la password del WiFi."</p>
-                        <span class="text-[10px] uppercase font-black tracking-widest text-brandCyan">Sara L. (Roma)</span>
+                    <div class="p-7 glass-panel rounded-2xl hover:border-white/10 transition-all">
+                        <div class="flex gap-1 mb-4 text-brandCyan text-xs">★★★★★</div>
+                        <p class="text-xs text-zinc-400 italic mb-5 leading-relaxed">"L'assistente Concierge24 ha azzerato le chiamate in reception per la password del WiFi. Il team ringrazia."</p>
+                        <div>
+                            <div class="text-[9px] uppercase font-black tracking-widest text-brandCyan">Sara L.</div>
+                            <div class="text-[9px] text-zinc-600 uppercase tracking-wider">Direttrice — Roma</div>
+                        </div>
                     </div>
-                    <div class="p-6 glass-panel rounded-2xl">
-                        <p class="text-xs text-zinc-400 italic mb-6">"Marketing di un altro livello. Le auto sembrano fotografate in studio. DriveMotion ha cambiato le nostre vendite."</p>
-                        <span class="text-[10px] uppercase font-black tracking-widest text-brandCyan">Studio Rossi</span>
+                    <div class="p-7 glass-panel rounded-2xl hover:border-white/10 transition-all">
+                        <div class="flex gap-1 mb-4 text-brandCyan text-xs">★★★★★</div>
+                        <p class="text-xs text-zinc-400 italic mb-5 leading-relaxed">"Marketing di un altro livello. Le auto sembrano fotografate in studio. DriveMotion ha cambiato le nostre vendite."</p>
+                        <div>
+                            <div class="text-[9px] uppercase font-black tracking-widest text-brandCyan">Studio Rossi</div>
+                            <div class="text-[9px] text-zinc-600 uppercase tracking-wider">Concessionario</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Pricing Section (Anchoring Neuroscienze) -->
+        <!-- ═══ PRICING ═══ -->
         <section id="pricing" class="py-32 px-6 border-t border-white/5">
             <div class="max-w-4xl mx-auto text-center">
-                <h2 class="text-3xl md:text-4xl font-black mb-4 uppercase">Un investimento irrisorio</h2>
-                <p class="text-xs text-zinc-500 mb-16 uppercase tracking-widest font-bold">Meno del costo di un caffè al giorno per automatizzare la tua reception</p>
-                
-                <div class="grid md:grid-cols-2 gap-8 max-w-2xl mx-auto text-left">
-                    <!-- Standard Plan -->
-                    <div class="p-8 glass-panel rounded-3xl relative border border-brandCyan/20">
-                        <span class="absolute top-0 right-6 -translate-y-1/2 bg-brandCyan text-black text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-wider">Scelta Intelligente</span>
-                        <h3 class="text-lg font-bold text-white mb-1">Standard Plan</h3>
-                        <p class="text-xs text-zinc-400 mb-6">Ottimizzato per hotel, agenzie e siti aziendali.</p>
-                        <div class="mb-6">
+                <p class="font-mono text-[9px] text-brandCyan uppercase tracking-[5px] mb-4">Investimento</p>
+                <h2 class="text-3xl md:text-4xl font-black mb-4 uppercase">Meno di un caffè al giorno</h2>
+                <p class="text-xs text-zinc-500 mb-16 uppercase tracking-widest font-bold">Per automatizzare la tua reception commerciale H24</p>
+
+                <div class="grid md:grid-cols-2 gap-7 max-w-2xl mx-auto text-left">
+                    <!-- Standard -->
+                    <div class="p-8 glass-panel rounded-3xl relative border border-brandCyan/25 shadow-[0_0_40px_rgba(6,182,212,0.08)]">
+                        <span class="absolute -top-3.5 right-6 bg-brandCyan text-black text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Più Popolare</span>
+                        <h3 class="text-base font-bold text-white mb-1">Standard Plan</h3>
+                        <p class="text-xs text-zinc-500 mb-6 leading-relaxed">Per hotel, agenzie e siti aziendali.</p>
+                        <div class="mb-7 flex items-end gap-2">
                             <span class="text-4xl font-black text-white">€49</span>
-                            <span class="text-zinc-500 text-xs">/ mese</span>
+                            <span class="text-zinc-600 text-xs pb-1">/ mese</span>
                         </div>
-                        <ul class="text-xs text-zinc-300 space-y-3 mb-8">
-                            <li>✓ <span class="text-zinc-400">1 Chatbot Attivo sul tuo sito</span></li>
-                            <li>✓ <span class="text-zinc-400">Messaggi e lead illimitati</span></li>
-                            <li>✓ <span class="text-zinc-400">Allineamento estetico e colore Hex</span></li>
-                            <li>✓ <span class="text-zinc-400">Integrazione API n8n integrata</span></li>
+                        <ul class="text-xs text-zinc-400 space-y-3 mb-8">
+                            <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> 1 Chatbot attivo sul tuo sito</li>
+                            <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> Messaggi e lead illimitati</li>
+                            <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> Allineamento estetico e colore Hex</li>
+                            <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> Integrazione API n8n inclusa</li>
                         </ul>
-                        <button onclick="alert('Integrazione Stripe attiva')" class="w-full bg-white text-black font-bold py-3 rounded-xl text-xs uppercase tracking-widest hover:bg-neutral-200 transition">
+                        <button onclick="alert('Integrazione Stripe attiva')"
+                            class="w-full bg-white text-black font-black py-3 rounded-xl text-xs uppercase tracking-widest hover:bg-neutral-100 transition active:scale-95">
                             Attiva Ora
                         </button>
                     </div>
 
-                    <!-- Custom / Enterprise -->
-                    <div class="p-8 glass-panel rounded-3xl opacity-75">
-                        <h3 class="text-lg font-bold text-white mb-1">Custom Hub</h3>
-                        <p class="text-xs text-zinc-400 mb-6">Ecosistemi complessi con integrazioni CRM.</p>
-                        <div class="mb-6">
+                    <!-- Custom -->
+                    <div class="p-8 glass-panel rounded-3xl opacity-80 hover:opacity-100 transition-opacity">
+                        <h3 class="text-base font-bold text-white mb-1">Custom Hub</h3>
+                        <p class="text-xs text-zinc-500 mb-6 leading-relaxed">Ecosistemi complessi con integrazioni CRM.</p>
+                        <div class="mb-7 flex items-end gap-2">
                             <span class="text-4xl font-black text-white">€199</span>
-                            <span class="text-zinc-500 text-xs">/ mese</span>
+                            <span class="text-zinc-600 text-xs pb-1">/ mese</span>
                         </div>
-                        <ul class="text-xs text-zinc-300 space-y-3 mb-8">
-                            <li>✓ <span class="text-zinc-400">Fino a 5 chatbot contemporanei</span></li>
-                            <li>✓ <span class="text-zinc-400">Allineamento cognitivo multi-pagina</span></li>
-                            <li>✓ <span class="text-zinc-400">Supporto tecnico dedicato su WhatsApp</span></li>
-                            <li>✓ <span class="text-zinc-400">Integrazione Webhook verso il tuo CRM</span></li>
+                        <ul class="text-xs text-zinc-400 space-y-3 mb-8">
+                            <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> Fino a 5 chatbot contemporanei</li>
+                            <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> Allineamento cognitivo multi-pagina</li>
+                            <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> Supporto tecnico dedicato su WhatsApp</li>
+                            <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> Webhook verso il tuo CRM</li>
                         </ul>
-                        <a href="#contatti" class="w-full bg-zinc-800 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-widest hover:bg-zinc-700 transition text-center block">
+                        <a href="#contatti"
+                            class="w-full bg-zinc-800 text-white font-black py-3 rounded-xl text-xs uppercase tracking-widest hover:bg-zinc-700 transition text-center block active:scale-95">
                             Parla Con Noi
                         </a>
                     </div>
@@ -267,35 +510,46 @@
             </div>
         </section>
 
-        <!-- Sezione Webform / Contatti -->
-        <section id="contatti" class="py-24 px-6 border-t border-white/5 relative">
-            <div class="max-w-4xl mx-auto glass-panel p-8 md:p-12 rounded-[2.5rem] relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-64 h-64 bg-brandCyan/10 blur-3xl rounded-full pointer-events-none"></div>
-                <h2 class="text-3xl font-bold mb-2 flex items-center gap-3 relative z-10">
-                    <span class="w-3 h-3 rounded-full bg-green-400 shadow-[0_0_10px_#4ade80]"></span>
+        <!-- ═══ CONTATTI ═══ -->
+        <section id="contatti" class="py-24 px-6 border-t border-white/5">
+            <div class="max-w-4xl mx-auto glass-panel grain p-8 md:p-12 rounded-[2.5rem] relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-72 h-72 bg-brandCyan/8 blur-3xl rounded-full pointer-events-none"></div>
+                <div class="absolute bottom-0 left-0 w-56 h-56 bg-brandPurple/8 blur-3xl rounded-full pointer-events-none"></div>
+                <h2 class="text-2xl font-bold mb-2 flex items-center gap-3 relative z-10">
+                    <span class="w-2.5 h-2.5 rounded-full bg-green-400 shadow-[0_0_10px_#4ade80]"></span>
                     Contatta il Lab
                 </h2>
-                <p class="text-zinc-400 mb-8 relative z-10">Hai domande o vuoi un preventivo personalizzato per un'automazione complessa? Ti rispondiamo entro 24 ore.</p>
-                
-                <form action="https://api.web3forms.com/submit" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+                <p class="text-zinc-400 text-sm mb-8 relative z-10 max-w-md">Vuoi un preventivo personalizzato o un'automazione complessa? Ti rispondiamo entro 24 ore.</p>
+
+                <form action="https://api.web3forms.com/submit" method="POST"
+                    class="grid grid-cols-1 md:grid-cols-2 gap-5 relative z-10">
                     <input type="hidden" name="access_key" value="9013a8d5-0901-42a0-b9e6-4c45553f960d">
-                    <input type="hidden" name="subject" value="Nuovo Contatto da NexusAI Landing">
-                    <input type="hidden" name="redirect" value="https://nexus.rmstudio.app/">
-                    
+                    <input type="hidden" name="subject"    value="Nuovo Contatto da NexusAI Landing">
+                    <input type="hidden" name="redirect"   value="https://nexus.rmstudio.app/">
+
                     <div>
-                        <label class="block text-sm text-zinc-400 mb-2 uppercase tracking-widest font-bold">Il tuo Nome</label>
-                        <input type="text" name="name" required class="w-full bg-black/50 border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-brandCyan transition-colors" placeholder="Esempio: Riccardo Modena">
+                        <label class="block text-[9px] text-zinc-500 mb-2 uppercase tracking-widest font-black">Il tuo Nome</label>
+                        <input type="text" name="name" required
+                            class="w-full bg-black/50 border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-brandCyan transition-colors text-sm"
+                            placeholder="Riccardo Modena">
                     </div>
                     <div>
-                        <label class="block text-sm text-zinc-400 mb-2 uppercase tracking-widest font-bold">La tua Email</label>
-                        <input type="email" name="email" required class="w-full bg-black/50 border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-brandCyan transition-colors" placeholder="nome@azienda.com">
+                        <label class="block text-[9px] text-zinc-500 mb-2 uppercase tracking-widest font-black">La tua Email</label>
+                        <input type="email" name="email" required
+                            class="w-full bg-black/50 border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-brandCyan transition-colors text-sm"
+                            placeholder="nome@azienda.com">
                     </div>
                     <div class="md:col-span-2">
-                        <label class="block text-sm text-zinc-400 mb-2 uppercase tracking-widest font-bold">Messaggio</label>
-                        <textarea name="message" required rows="4" class="w-full bg-black/50 border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-brandCyan transition-colors resize-none" placeholder="Descrivi il processo che vuoi automatizzare..."></textarea>
+                        <label class="block text-[9px] text-zinc-500 mb-2 uppercase tracking-widest font-black">Messaggio</label>
+                        <textarea name="message" required rows="4"
+                            class="w-full bg-black/50 border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-brandCyan transition-colors resize-none text-sm"
+                            placeholder="Descrivi il processo che vuoi automatizzare..."></textarea>
                     </div>
-                    <div class="md:col-span-2 mt-2">
-                        <button type="submit" class="w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-slate-200 transition-transform active:scale-95 text-lg">Invia Messaggio</button>
+                    <div class="md:col-span-2">
+                        <button type="submit"
+                            class="w-full bg-white text-black font-black py-4 rounded-xl hover:bg-slate-100 transition-all active:scale-95 text-sm uppercase tracking-widest">
+                            Invia Messaggio
+                        </button>
                     </div>
                 </form>
             </div>
@@ -305,220 +559,268 @@
 
     <!-- Footer -->
     <footer class="border-t border-white/10 bg-black py-16 px-6 relative z-10">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12 text-center md:text-left">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10 text-center md:text-left">
             <div class="max-w-xs">
-                <div class="flex items-center justify-center md:justify-start gap-3 text-white font-black text-2xl mb-4">
-                    <img src="logo_nexus_bg.png" alt="Logo" class="h-10 w-auto object-contain">
-                    <span>Nexus<span class="text-brandCyan italic">AI</span></span>
+                <div class="flex items-center justify-center md:justify-start gap-3 text-white font-black text-xl mb-3">
+                    <img src="logo_nexus_bg.png" alt="Logo" class="h-9 w-auto object-contain">
+                    <span class="font-mono">Nexus<span class="text-brandCyan italic">AI</span></span>
                 </div>
-                <p class="text-zinc-500 text-sm leading-relaxed">Ingegneria dei Sistemi Autonomi. Sviluppato da RM Studio.</p>
-                <p class="text-zinc-600 text-xs mt-6">© 2026 RM Studio. Tutti i diritti riservati.</p>
+                <p class="text-zinc-500 text-xs leading-relaxed">Ingegneria dei Sistemi Autonomi.<br>Sviluppato da RM Studio.</p>
+                <p class="text-zinc-700 text-[10px] mt-5">© 2026 RM Studio. Tutti i diritti riservati.</p>
             </div>
 
-            <div class="flex flex-col items-center md:items-start gap-4">
-                <h4 class="text-white font-bold text-sm uppercase tracking-widest mb-2">Social Hub</h4>
-                <div class="flex gap-4">
-                    <a href="https://www.instagram.com/riccardo_mode_/" target="_blank" class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white hover:border-brandCyan/50 transition-all">IG</a>
-                    <a href="https://www.facebook.com/riccardo.modena.792" target="_blank" class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white hover:border-brandCyan/50 transition-all">FB</a>
-                    <a href="https://www.linkedin.com/in/riccardo-modena-13918a61/" target="_blank" class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white hover:border-brandCyan/50 transition-all">IN</a>
-                    <a href="https://www.tiktok.com/@mr3d.riccardo" target="_blank" class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white hover:border-brandCyan/50 transition-all">TK</a>
+            <div class="flex flex-col items-center md:items-start gap-3">
+                <h4 class="text-white font-black text-[9px] uppercase tracking-widest mb-1">Social Hub</h4>
+                <div class="flex gap-3">
+                    <a href="https://www.instagram.com/riccardo_mode_/" target="_blank"
+                        class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-zinc-500 hover:text-white hover:border-brandCyan/50 transition-all text-xs font-bold">IG</a>
+                    <a href="https://www.facebook.com/riccardo.modena.792" target="_blank"
+                        class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-zinc-500 hover:text-white hover:border-brandCyan/50 transition-all text-xs font-bold">FB</a>
+                    <a href="https://www.linkedin.com/in/riccardo-modena-13918a61/" target="_blank"
+                        class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-zinc-500 hover:text-white hover:border-brandCyan/50 transition-all text-xs font-bold">IN</a>
+                    <a href="https://www.tiktok.com/@mr3d.riccardo" target="_blank"
+                        class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-zinc-500 hover:text-white hover:border-brandCyan/50 transition-all text-xs font-bold">TK</a>
                 </div>
             </div>
 
             <div class="flex flex-col items-center md:items-end gap-2">
-                <h4 class="text-white font-bold text-sm uppercase tracking-widest mb-4">Supporto</h4>
-                <a href="#contatti" class="bg-white/10 hover:bg-white/20 border border-white/20 text-white px-6 py-2 rounded-full text-sm font-bold transition-all">Parla con noi</a>
+                <h4 class="text-white font-black text-[9px] uppercase tracking-widest mb-3">Supporto</h4>
+                <a href="#contatti"
+                    class="bg-white/8 hover:bg-white/15 border border-white/15 text-white px-6 py-2 rounded-full text-xs font-bold transition-all">
+                    Parla con noi
+                </a>
             </div>
         </div>
     </footer>
 
-    <!-- Chatbot Unificato Posizionato a Sinistra (Asimmetria di Pregio) -->
-    <div id="chatbot-container" class="relative z-50"></div>
+    <!-- ═══════════════════════════════════════════════
+         CHATBOT — n8n webhook + quick replies + framing
+         ═══════════════════════════════════════════════ -->
+    <div id="nx-bubble" class="animated-glow-border" role="button" aria-label="Apri chat">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#06b6d4"
+             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+    </div>
+
+    <div id="nx-window" class="animated-glow-border">
+        <div class="nx-header">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <img src="logo_nexus_bg.png" style="width:28px;height:28px;object-fit:contain;" alt="NexusAI">
+                <div style="display:flex;flex-direction:column;">
+                    <span style="font-size:13px;font-weight:800;letter-spacing:1px;font-family:'Space Mono',monospace;">NexusAI Pilot</span>
+                    <span style="font-size:10px;color:var(--green);font-weight:600;letter-spacing:.03em;">● Attivo e online</span>
+                </div>
+            </div>
+            <button id="nx-close-btn" style="background:none;border:none;color:#fff;opacity:.4;font-size:24px;cursor:pointer;line-height:1;padding:4px;" aria-label="Chiudi">&times;</button>
+        </div>
+
+        <div id="nx-messages" class="nx-messages"></div>
+
+        <!-- Quick replies slot -->
+        <div id="nx-quick-replies" class="nx-quick-replies"></div>
+
+        <div class="nx-input-area">
+            <input type="text" id="nx-input" placeholder="Scrivi o scegli una domanda…" autocomplete="off">
+            <button id="nx-send-btn">Invia</button>
+        </div>
+    </div>
+
+    <!-- ════ SCRIPTS ════ -->
     <script>
+    /* ─── Config ─── */
     const WEBHOOK_CHATBOT = 'https://n8n.rmstudio.app/webhook/chatbot-builder';
-    let chatSessionId = localStorage.getItem('nexus_chat_session') || ('nx_' + Math.random().toString(36).substring(7));
-    localStorage.setItem('nexus_chat_session', chatSessionId);
-    let chatIsOpen = window.innerWidth > 1024; // Aperto di default solo su schermi larghi per massimo impatto visivo
+    const SESSION_KEY     = 'nexus_chat_session';
 
-    function injectChatbot() {
-        const container = document.getElementById('chatbot-container');
-        container.innerHTML = `
-        <style>
-        :root {
-            --cyan: #06b6d4;
-            --purple: #8b5cf6;
-            --surface: rgba(8, 8, 12, 0.95);
-            --border: rgba(255, 255, 255, 0.08);
-            --green-glow: #22c55e;
-        }
-        #nx-bubble { position:fixed; bottom:30px; left:30px; width:65px; height:65px;
-            border-radius:50%; background:#050508; box-shadow:0 0 20px rgba(6,182,212,0.3);
-            cursor:pointer; z-index:9999; display:flex; align-items:center; justify-content:center;
-            transition:transform .3s; }
-        #nx-bubble:hover { transform:scale(1.08); }
-        #nx-window { position:fixed; bottom:110px; left:30px; width:360px; height:530px;
-            background:var(--surface); backdrop-filter: blur(20px); border-radius:24px; box-shadow:0 30px 70px rgba(0,0,0,.9);
-            z-index:9999; display:none; flex-direction:column; overflow:hidden;
-            font-family:inherit; transition: all 0.3s; }
-        .nx-header { background:rgba(15,15,22,0.9); border-bottom:1px solid var(--border); color:#ffffff;
-            padding:18px 20px; font-weight:700; display:flex; justify-content:space-between; align-items:center; }
-        .nx-messages { flex:1; padding:20px; overflow-y:auto; background:#020204;
-            display:flex; flex-direction:column; gap:14px; scroll-behavior:smooth; }
-        .nx-msg { padding:12px 16px; border-radius:16px; font-size:14px; max-width:85%; line-height:1.5; text-align: left;}
-        .nx-msg.bot  { background:#101016; color:#ededed; border:1px solid var(--border);
-            align-self:flex-start; border-bottom-left-radius:4px; }
-        .nx-msg.user { background:linear-gradient(135deg, var(--cyan), var(--purple)); color:#ffffff; font-weight:500;
-            align-self:flex-end; border-bottom-right-radius:4px; }
-        .nx-msg b { font-weight:700; color:var(--cyan); }
-        .nx-input-area { padding:14px; border-top:1px solid var(--border); display:flex; gap:10px; background:rgba(15,15,22,0.9); }
-        .nx-input-area input { flex:1; border:1px solid var(--border); border-radius:10px; padding:10px 14px;
-            outline:none; font-size:14px; color:#ffffff; background:#050508; }
-        .nx-input-area input:focus { border-color:var(--cyan); }
-        .nx-input-area button { background:linear-gradient(135deg, var(--cyan), var(--purple)); border:none; border-radius:10px; color:#ffffff;
-            cursor:pointer; font-weight:700; font-size:13px; padding:0 16px; transition:.2s; }
-        .nx-input-area button:hover { opacity:0.9; }
-        .typing-dot { width:5px; height:5px; background:var(--cyan); border-radius:50%;
-            display:inline-block; animation:nxtyping 1.4s infinite ease-in-out; margin-right:2px; }
-        .typing-dot:nth-child(2) { animation-delay:.2s; }
-        .typing-dot:nth-child(3) { animation-delay:.4s; }
-        @keyframes nxtyping { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-4px)} }
-        @media(max-width:450px) {
-            #nx-window { width:calc(100% - 40px); height:460px; left:20px; bottom:90px; }
-            #nx-bubble { bottom:20px; left:20px; }
-        }
-        </style>
-
-        <!-- Pulsante a sinistra con bordo ad anello pulsante -->
-        <div id="nx-bubble" class="animated-glow-border">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            </svg>
-        </div>
-
-        <!-- Finestra principale dotata di cornice sfumata dinamica -->
-        <div id="nx-window" class="animated-glow-border">
-            <div class="nx-header">
-                <div style="display:flex;align-items:center;gap:12px;">
-                    <img src="logo_nexus_bg.png" style="width:30px;height:30px;object-fit: contain;" alt="NexusAI">
-                    <div style="display:flex;flex-direction:column;">
-                        <span style="font-size:14px;line-height:1.2;font-weight:800;letter-spacing:1px;">NexusAI Pilot</span>
-                        <span style="font-size:10px;color:var(--green-glow);font-weight:normal;">● Attivo ed online</span>
-                    </div>
-                </div>
-                <button id="nx-close-btn" style="background:none;border:none;color:#ffffff;opacity:0.5;font-size:26px;cursor:pointer;line-height:1;">&times;</button>
-            </div>
-            <div id="nx-messages" class="nx-messages">
-                <div class="nx-msg bot">
-                    Benvenuto nel futuro della conversione. ⚡<br><br>
-                    Sono <b>NexusAI</b>. Posso essere clonato su qualsiasi sito web in meno di 10 secondi per guidare l'utente all'acquisto.<br><br>
-                    <b>Inserisci il link del tuo sito nel form a destra</b> o chiedimi come posso aiutarti ad automatizzare la tua attività!
-                </div>
-            </div>
-            <div class="nx-input-area">
-                <input type="text" id="nx-input" placeholder="Chiedimi come funziona..." onkeypress="if(event.key==='Enter') sendNxMsg()">
-                <button id="nx-send-btn">Chiedi</button>
-            </div>
-        </div>
-        `;
-
-        // Collega gli eventi solo DOPO aver iniettato il codice HTML nel container
-        document.getElementById('nx-bubble').addEventListener('click', toggleNxChat);
-        document.getElementById('nx-close-btn').addEventListener('click', toggleNxChat);
-        document.getElementById('nx-send-btn').addEventListener('click', sendNxMsg);
-
-        // Allineamento stato iniziale
-        document.getElementById('nx-window').style.display = chatIsOpen ? 'flex' : 'none';
-        
-        // Simula auto-scrittura di un messaggio di benvenuto dinamico dopo 2.5 secondi se aperto
-        if (chatIsOpen) {
-            setTimeout(() => {
-                showInitialAIComment();
-            }, 3000);
-        }
+    /* Session ID senza localStorage (evita problemi CORS/iframe) */
+    let chatSessionId = sessionStorage.getItem(SESSION_KEY);
+    if (!chatSessionId) {
+        chatSessionId = 'nx_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+        sessionStorage.setItem(SESSION_KEY, chatSessionId);
     }
 
-    function toggleNxChat() {
-        const win  = document.getElementById('nx-window');
+    let chatIsOpen = false;
+
+    /* ─── Quick replies predefinite (neuroscienza: riduzione attrito) ─── */
+    const QUICK_REPLIES = [
+        { label: '💬 Come funziona?',           text: 'Come funziona NexusAI concretamente?' },
+        { label: '💰 Quanto costa?',             text: 'Quali sono i prezzi e i piani disponibili?' },
+        { label: '⚡ Quanto ci vuole ad attivarlo?', text: 'Quanto tempo ci vuole per attivare il chatbot?' },
+        { label: '🤝 Posso vederlo in azione?',  text: 'Posso fare una demo live sul mio sito?' },
+        { label: '🔌 Funziona con n8n?',         text: 'Come si integra con n8n e i miei workflow?' },
+    ];
+
+    /* ─── Sequenza di benvenuto (frasi brevi, 2s l'una dall'altra) ─── */
+    const WELCOME_SEQUENCE = [
+        { text: 'Benvenuto nel futuro della conversione. ⚡', delay: 600  },
+        { text: 'Sono <b>NexusAI</b>: il tuo agente commerciale che non dorme mai.',     delay: 2600 },
+        { text: 'Posso essere attivato su <b>qualsiasi sito</b> in meno di 10 secondi.', delay: 4600 },
+        { text: 'Cosa vuoi sapere? Scegli qui sotto o scrivimi direttamente. 👇',         delay: 6600 },
+    ];
+
+    /* ─── DOM refs ─── */
+    const win      = document.getElementById('nx-window');
+    const bubble   = document.getElementById('nx-bubble');
+    const closeBtn = document.getElementById('nx-close-btn');
+    const msgBox   = document.getElementById('nx-messages');
+    const input    = document.getElementById('nx-input');
+    const sendBtn  = document.getElementById('nx-send-btn');
+    const qrBox    = document.getElementById('nx-quick-replies');
+
+    /* ─── Toggle ─── */
+    function toggleChat() {
         chatIsOpen = !chatIsOpen;
-        win.style.display = chatIsOpen ? 'flex' : 'none';
+        if (chatIsOpen) {
+            win.style.display = 'flex';
+            win.classList.add('open');
+        } else {
+            win.style.display = 'none';
+            win.classList.remove('open');
+        }
     }
 
-    async function showInitialAIComment() {
-        const loadingId = 'loading-welcome';
-        addNxMsg('<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>', 'bot', loadingId);
-        
-        setTimeout(() => {
-            const loadEl = document.getElementById(loadingId);
-            if (loadEl) loadEl.remove();
-            addNxMsg("Sapevi che il <b>98% delle visite</b> sui siti vetrina non produce contatti perché le persone odiano leggere? Io risolvo questo problema eliminando lo sforzo di navigazione. 😉", 'bot');
-        }, 2000);
+    bubble.addEventListener('click', () => {
+        toggleChat();
+        if (chatIsOpen && msgBox.children.length === 0) startWelcomeSequence();
+    });
+    closeBtn.addEventListener('click', toggleChat);
+
+    /* ─── Welcome sequence ─── */
+    function startWelcomeSequence() {
+        WELCOME_SEQUENCE.forEach(({ text, delay }, i) => {
+            const isLast = i === WELCOME_SEQUENCE.length - 1;
+
+            /* typing indicator */
+            setTimeout(() => {
+                const dotId = 'typing-' + i;
+                addMsg('<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>', 'bot', dotId);
+            }, delay - 300);
+
+            /* actual message */
+            setTimeout(() => {
+                const el = document.getElementById('typing-' + i);
+                if (el) el.remove();
+                addMsg(text, 'bot');
+                if (isLast) renderQuickReplies();
+            }, delay + 600);
+        });
     }
 
-    async function sendNxMsg() {
-        const input = document.getElementById('nx-input');
-        const text  = input.value.trim();
-        if (!text) return;
+    /* ─── Quick replies ─── */
+    function renderQuickReplies() {
+        qrBox.innerHTML = '';
+        QUICK_REPLIES.forEach(({ label, text }) => {
+            const btn = document.createElement('button');
+            btn.className = 'nx-qr';
+            btn.textContent = label;
+            btn.addEventListener('click', () => {
+                qrBox.innerHTML = ''; /* hide after use */
+                sendMessage(text);
+            });
+            qrBox.appendChild(btn);
+        });
+    }
 
+    /* ─── Send ─── */
+    sendBtn.addEventListener('click', () => {
+        const txt = input.value.trim();
+        if (!txt) return;
         input.value = '';
-        addNxMsg(text, 'user');
+        qrBox.innerHTML = '';
+        sendMessage(txt);
+    });
+    input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') sendBtn.click();
+    });
 
-        const loadingId = 'loading-' + Date.now();
-        addNxMsg('<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>', 'bot', loadingId);
+    async function sendMessage(text) {
+        addMsg(text, 'user');
+
+        const loadId = 'typing-send-' + Date.now();
+        addMsg('<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>', 'bot', loadId);
 
         try {
             const res = await fetch(WEBHOOK_CHATBOT, {
                 method:  'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body:    JSON.stringify({ message: text, sessionId: chatSessionId, strutturaId: 'nexus_landing' }),
-                signal:  AbortSignal.timeout(15000)
+                body:    JSON.stringify({
+                    message:     text,
+                    sessionId:   chatSessionId,
+                    strutturaId: 'nexus_landing'
+                }),
+                signal: AbortSignal.timeout(15000)
             });
 
             const raw = await res.text();
             let reply = 'Nessuna risposta ricevuta.';
-            if (raw && raw.trim() !== '') {
+
+            if (raw && raw.trim()) {
                 try {
                     const data = JSON.parse(raw);
                     reply = data.response || data.output || data.text || reply;
-                } catch (_) { reply = raw; }
+                } catch (_) {
+                    reply = raw;
+                }
             }
 
-            const loadEl = document.getElementById(loadingId);
-            if (loadEl) loadEl.remove();
-            addNxMsg(reply, 'bot');
+            const el = document.getElementById(loadId);
+            if (el) el.remove();
+            addMsg(reply, 'bot');
 
         } catch (err) {
-            const loadEl = document.getElementById(loadingId);
-            if (loadEl) loadEl.remove();
-            addNxMsg('Impossibile stabilire una connessione stabile con i sistemi centrali di RM Studio. Riprova tra un secondo.', 'bot');
+            const el = document.getElementById(loadId);
+            if (el) el.remove();
+            addMsg('Connessione non riuscita. Riprova tra un momento.', 'bot');
         }
     }
 
-    function addNxMsg(text, sender, id) {
+    /* ─── Add message ─── */
+    function addMsg(html, sender, id) {
         const div = document.createElement('div');
-        div.className = `nx-msg ${sender}`;
+        div.className = 'nx-msg ' + sender;
         if (id) div.id = id;
-        div.innerHTML = text
+        div.innerHTML = html
             .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
             .replace(/\n/g, '<br>');
-        const box = document.getElementById('nx-messages');
-        box.appendChild(div);
-        box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });
+        msgBox.appendChild(div);
+        msgBox.scrollTo({ top: msgBox.scrollHeight, behavior: 'smooth' });
     }
 
-    function generateDemo(e) {
-        e.preventDefault();
-        const urlInput = document.getElementById('site-url').value.trim();
-        const mockBotId = 'demo_' + Math.random().toString(36).substring(7);
-        
-        // Collega direttamente il generatore di proxy Hetzner
-        const demoLink = 'https://demo.rmstudio.app/?site=' + encodeURIComponent(urlInput) + '&bot_id=' + encodeURIComponent(mockBotId) + '&name=NexusAI&color=06b6d4';
-        
-        document.getElementById('demo-link').href = demoLink;
-        document.getElementById('demo-link').textContent = demoLink;
-        document.getElementById('demo-result').classList.remove('hidden');
+    /* ─── Demo generator ─── */
+    function generateDemo() {
+        const urlRaw = document.getElementById('site-url').value.trim();
+        if (!urlRaw) { document.getElementById('site-url').focus(); return; }
+
+        /* Ensure protocol */
+        let url = urlRaw;
+        if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+
+        const botId   = 'demo_' + Math.random().toString(36).slice(2, 9);
+        const params  = new URLSearchParams({
+            site:  url,
+            bot_id: botId,
+            name:  'NexusAI',
+            color: '06b6d4'
+        });
+        const link = 'https://demo.rmstudio.app/?' + params.toString();
+
+        const linkEl    = document.getElementById('demo-link');
+        const resultDiv = document.getElementById('demo-result');
+        linkEl.href        = link;
+        linkEl.textContent = link;
+        resultDiv.classList.remove('hidden');
     }
 
-    document.addEventListener('DOMContentLoaded', injectChatbot);
+    /* ─── Live counter (social proof) ─── */
+    (function () {
+        const el   = document.getElementById('live-count');
+        const base = 247;
+        setInterval(() => {
+            const delta = Math.floor(Math.random() * 3) - 1; /* -1, 0, or +1 */
+            const next  = Math.max(230, parseInt(el.textContent) + delta);
+            el.textContent = next;
+        }, 4000);
+    })();
     </script>
 
 </body>
