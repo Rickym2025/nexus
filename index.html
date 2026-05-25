@@ -924,27 +924,57 @@
     }
 
     /* Demo generator */
-    function generateDemo() {
+        async function generateDemo() {
         const urlRaw = document.getElementById('site-url').value.trim();
         if (!urlRaw) { document.getElementById('site-url').focus(); return; }
-
+    
+        /* Forza il protocollo corretto */
         let url = urlRaw;
         if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
-
-        const botId   = 'demo_' + Math.random().toString(36).slice(2, 9);
-        const params  = new URLSearchParams({
-            site:  url,
-            bot_id: botId,
-            name:  'NexusAI',
-            color: '06b6d4'
-        });
-        const link = 'https://demo.rmstudio.app/?' + params.toString();
-
-        const linkEl    = document.getElementById('demo-link');
-        const resultDiv = document.getElementById('demo-result');
-        linkEl.href        = link;
-        linkEl.textContent = link;
-        resultDiv.classList.remove('hidden');
+    
+        const botId = 'demo_' + Math.random().toString(36).slice(2, 9);
+        
+        // Riferimenti grafici del bottone
+        const submitBtn = document.querySelector('#demo button');
+        const originalText = submitBtn.textContent;
+        
+        // Disabilita pulsante e mostra caricamento neuroscienza (Effetto Sforzo/Valore)
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Analisi e addestramento AI (10s)...';
+    
+        try {
+            const res = await fetch('https://n8n.rmstudio.app/webhook/chatbot-creator', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    site_url: url,
+                    bot_id: botId,
+                    nome_struttura: 'Demo Client',
+                    is_paid: false // Impostato su false per la demo gratuita (1 pagina)
+                }),
+                signal: AbortSignal.timeout(20000) // Timeout di sicurezza a 20 secondi
+            });
+            
+            const data = await res.json();
+            
+            if (data.success && data.demo_url) {
+                const linkEl = document.getElementById('demo-link');
+                const resultDiv = document.getElementById('demo-result');
+                
+                linkEl.href = data.demo_url;
+                linkEl.textContent = data.demo_url;
+                resultDiv.classList.remove('hidden');
+            } else {
+                alert("Errore nell'analisi del sito. Riprova tra qualche istante.");
+            }
+        } catch(e) {
+            console.error(e);
+            alert("Errore di rete durante la generazione della demo. Verifica la connessione.");
+        } finally {
+            // Ripristina il pulsante
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
     }
 
     /* Live counter */
