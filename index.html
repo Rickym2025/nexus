@@ -34,12 +34,12 @@
             background-color: #030307;
             color: #f4f4f5;
             font-family: 'DM Sans', sans-serif;
-            font-size: 17px; /* Aumentata leggibilità globale */
+            font-size: 17px;
         }
 
         /* ── Glassmorphism leggero (Ottimizzato per performance video) ── */
         .glass-panel {
-            backdrop-filter: blur(8px); /* Ridotto da 24px per non affaticare la GPU */
+            backdrop-filter: blur(8px);
             background: rgba(10, 10, 15, 0.92);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
@@ -52,7 +52,7 @@
         }
         .animated-rainbow-border { 
             border-width: 2px;
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.25); /* Ombra statica per non ricalcolare i pixel in movimento */
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.25);
             animation: border-rainbow 8s infinite linear; 
         }
 
@@ -231,7 +231,7 @@
                 <img src="logo_nexus_bg.png" alt="NexusAI Logo" class="w-8 h-8 object-contain animate-pulse">
                 <span class="font-black tracking-[0.2em] text-base uppercase font-mono text-white">NexusAI</span>
             </div>
-            <nav class="hidden md:flex items-center gap-7 text-xs text-zinc-200 font-bold uppercase tracking-widest">
+            <nav class="hidden md:flex items-center gap-7 text-xs text-zinc-300 font-bold uppercase tracking-widest">
                 <a href="#come-funziona" class="hover:text-white transition-colors font-sans text-sm">Come Funziona</a>
                 <a href="#demo-azione"   class="hover:text-white transition-colors font-sans text-sm">In Azione</a>
                 <a href="#ecosistema"    class="hover:text-white transition-colors font-sans text-sm">Ecosistema</a>
@@ -283,7 +283,7 @@
                             <input type="url" id="site-url" placeholder="https://tuosito.com"
                                 class="w-full bg-black border border-zinc-700 text-white rounded-xl px-4 py-3.5 text-base outline-none focus:border-brandCyan transition-colors">
                         </div>
-                        <button onclick="()" class="w-full bg-brandCyan text-black font-black py-4 rounded-xl text-xs hover:bg-cyan-400 transition uppercase tracking-widest active:scale-95">
+                        <button onclick="generateDemo()" class="w-full bg-brandCyan text-black font-black py-4 rounded-xl text-xs hover:bg-cyan-400 transition uppercase tracking-widest active:scale-95">
                             Genera Demo Live →
                         </button>
                     </div>
@@ -530,7 +530,7 @@
                         <p class="text-xs text-zinc-400 mb-6 leading-relaxed">Per hotel, agenzie e siti aziendali.</p>
                         <div class="mb-7 flex items-end gap-2">
                             <span class="text-4xl font-black text-white">€49</span>
-                            <span class="text-zinc-600 text-xs pb-1">/ mese</span>
+                            <span class="text-zinc-500 text-xs pb-1">/ mese</span>
                         </div>
                         <ul class="text-xs text-zinc-300 space-y-3 mb-8">
                             <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> 1 Chatbot attivo sul tuo sito</li>
@@ -552,7 +552,7 @@
                             <span class="text-4xl font-black text-white">€199</span>
                             <span class="text-zinc-600 text-xs pb-1">/ mese</span>
                         </div>
-                        <ul class="text-xs text-zinc-300 space-y-3 mb-8">
+                        <ul class="text-xs text-zinc-400 space-y-3 mb-8">
                             <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> Fino a 5 chatbot contemporanei</li>
                             <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> <strong>Scansione profonda (+10 pagine o PDF)</strong></li>
                             <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> Supporto tecnico dedicato su WhatsApp</li>
@@ -687,9 +687,9 @@
         </div>
     </div>
 
-    <!-- ════ SCRIPTS GENERALI E LOGICA DI NAVIGAZIONE ════ -->
+    <!-- ════ SCRIPTS ════ -->
     <script>
-    /* ─── Configurazione Globale ─── */
+    /* ─── Config ─── */
     const WEBHOOK_CHATBOT = 'https://n8n.rmstudio.app/webhook/chatbot-builder';
     const SESSION_KEY     = 'nexus_chat_session';
 
@@ -699,14 +699,14 @@
         sessionStorage.setItem(SESSION_KEY, chatSessionId);
     }
 
-    // Il bot si apre di default su Desktop e Tablet, chiuso su Mobile per usabilità
+    // Forza il bot ad essere aperto di default su PC e Tablet, chiuso su Mobile
     let chatIsOpen = window.innerWidth > 768;
 
-    /* Risposte rapide del bot (Risoluzione attrito cognitivo) */
+    /* Quick replies predefinite */
     const QUICK_REPLIES = [
         { label: '💬 Come funziona?',           text: 'Come funziona NexusAI concretamente?' },
         { label: '💰 Quanto costa?',             text: 'Quali sono i prezzi e i piani disponibili?' },
-        { label: '⚡ Quanto ci vuole?',          text: 'Quanto tempo ci vuole per attivare il chatbot?' }
+        { label: '⚡ Quanto ci vuole?',          text: 'Quanto tempo ci vuole per attivare il chatbot?' },
     ];
 
     /* Sequenza di benvenuto con timing reale spaziato a 2 secondi */
@@ -786,7 +786,7 @@
         }
     });
 
-    /* Sequenza di benvenuto sequenziale */
+    /* Welcome sequence sequenziale e distanziata */
     function startWelcomeSequence() {
         let i = 0;
         function showNext() {
@@ -831,7 +831,7 @@
         if (!text) return;
 
         input.value = '';
-        qrBox.innerHTML = ''; // Nasconde le risposte rapide
+        qrBox.innerHTML = ''; 
         addMsg(text, 'user');
 
         const loadId = 'typing-send-' + Date.now();
