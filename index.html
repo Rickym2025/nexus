@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PageGlow | AI Chatbot Overlay per il tuo Sito Web</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #050505;
+            color: #f4f4f5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col justify-between">
+
+    <!-- Navbar -->
+    <header class="border-b border-zinc-800 bg-zinc-950/50 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="h-6 w-6 bg-white text-black font-black rounded flex items-center justify-center text-xs">P</span>
+                <span class="font-bold tracking-tight text-white">PageGlow</span>
+            </div>
+            <nav class="hidden md:flex items-center gap-6 text-sm text-zinc-400">
+                <a href="#features" class="hover:text-white transition">Come Funziona</a>
+                <a href="#pricing" class="hover:text-white transition">Prezzi</a>
+            </nav>
+            <a href="#demo" class="bg-white text-black text-xs font-bold px-4 py-2 rounded hover:bg-zinc-200 transition">Prova Gratis</a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="max-w-4xl mx-auto px-6 pt-20 pb-16 text-center">
+        <span class="text-xs font-semibold uppercase tracking-wider text-zinc-500 bg-zinc-900 border border-zinc-800 px-3 py-1 rounded-full">Zero Codice richiesto</span>
+        <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-white mt-6 mb-4 max-w-2xl mx-auto leading-tight">
+            Mostra un assistente AI sul tuo sito in 10 secondi.
+        </h1>
+        <p class="text-base text-zinc-400 max-w-lg mx-auto mb-10">
+            Analizziamo il tuo sito web attuale, generiamo le regole e attiviamo un chatbot intelligente integrato, senza dover toccare il tuo codice.
+        </p>
+
+        <!-- Demo Form Box -->
+        <div id="demo" class="max-w-md mx-auto p-6 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl text-left">
+            <h3 class="text-sm font-bold text-white mb-1">Crea un'anteprima gratuita</h3>
+            <p class="text-xs text-zinc-400 mb-4">Inserisci l'URL del tuo sito per vedere l'assistente all'opera sopra la tua stessa pagina.</p>
+            
+            <form onsubmit="generateDemo(event)" class="space-y-4">
+                <div>
+                    <label class="block text-[10px] uppercase font-bold tracking-wider text-zinc-400 mb-1">Il tuo Sito Web</label>
+                    <input type="url" id="site-url" required placeholder="https://tuosito.com" 
+                        class="w-full bg-black border border-zinc-800 text-white rounded-lg px-3 py-2 text-sm outline-none focus:border-zinc-500 transition-colors">
+                </div>
+                <button type="submit" class="w-full bg-white text-black font-bold py-2.5 rounded-lg text-xs hover:bg-zinc-200 transition">
+                    Genera Demo Live
+                </button>
+            </form>
+            
+            <div id="demo-result" class="mt-4 pt-4 border-t border-zinc-800 hidden">
+                <p class="text-xs text-zinc-400 mb-2">La tua demo interattiva è pronta:</p>
+                <a id="demo-link" href="#" target="_blank" class="text-xs text-blue-400 underline break-all font-mono"></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="max-w-5xl mx-auto px-6 py-16 border-t border-zinc-900">
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="p-6 bg-zinc-900/40 border border-zinc-900 rounded-xl">
+                <div class="text-lg mb-2">🔍</div>
+                <h3 class="text-sm font-bold text-white mb-2">1. Scansione Automatica</h3>
+                <p class="text-xs text-zinc-400 leading-relaxed">Il nostro sistema legge ed estrae autonomamente i contenuti principali delle tue pagine web.</p>
+            </div>
+            <div class="p-6 bg-zinc-900/40 border border-zinc-900 rounded-xl">
+                <div class="text-lg mb-2">🧠</div>
+                <h3 class="text-sm font-bold text-white mb-2">2. Addestramento AI</h3>
+                <p class="text-xs text-zinc-400 leading-relaxed">Generiamo regole e istruzioni specifiche basandoci sulla tua offerta commerciale e sui tuoi servizi.</p>
+            </div>
+            <div class="p-6 bg-zinc-900/40 border border-zinc-900 rounded-xl">
+                <div class="text-lg mb-2">🔌</div>
+                <h3 class="text-sm font-bold text-white mb-2">3. Copia e Incolla</h3>
+                <p class="text-xs text-zinc-400 leading-relaxed">Ricevi un'unica riga di codice da inserire sul tuo sito reale per attivare definitivamente l'assistente.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="max-w-4xl mx-auto px-6 py-16 border-t border-zinc-900 text-center">
+        <h2 class="text-2xl font-bold text-white mb-2">Piani Semplici e Trasparenti</h2>
+        <p class="text-xs text-zinc-400 mb-10">Tutto il necessario per iniziare a convertire i visitatori in clienti.</p>
+        
+        <div class="max-w-sm mx-auto p-8 bg-zinc-900 border border-zinc-800 rounded-2xl text-left relative">
+            <span class="absolute top-0 right-6 -translate-y-1/2 bg-white text-black text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Più Scelto</span>
+            <h3 class="text-base font-bold text-white mb-1">Standard Plan</h3>
+            <p class="text-xs text-zinc-400 mb-4">Perfetto per siti vetrina, hotel e attività locali.</p>
+            <div class="mb-6">
+                <span class="text-3xl font-extrabold text-white">€49</span>
+                <span class="text-zinc-500 text-xs">/ mese</span>
+            </div>
+            <ul class="text-xs text-zinc-300 space-y-3 mb-8">
+                <li class="flex items-center gap-2">✓ <span class="text-zinc-400">1 Chatbot Attivo</span></li>
+                <li class="flex items-center gap-2">✓ <span class="text-zinc-400">Messaggi illimitati</span></li>
+                <li class="flex items-center gap-2">✓ <span class="text-zinc-400">Personalizzazione colori e nome</span></li>
+                <li class="flex items-center gap-2">✓ <span class="text-zinc-400">Aggiornamenti regole via email</span></li>
+            </ul>
+            <button onclick="alert('Integrazione Stripe di test')" class="w-full bg-white text-black font-bold py-2.5 rounded-lg text-xs hover:bg-zinc-200 transition text-center block">
+                Acquista Ora
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-zinc-900 bg-zinc-950 py-8 text-center text-xs text-zinc-500">
+        <p>&copy; 2026 PageGlow. Tutti i diritti riservati.</p>
+    </footer>
+
+    <script>
+        function generateDemo(e) {
+            e.preventDefault();
+            const urlInput = document.getElementById('site-url').value.trim();
+            const mockBotId = 'demo_' + Math.random().toString(36).substring(7);
+            
+            // Genera il link sfruttando l'applicazione proxy installata
+            const demoLink = window.location.origin + '/?site=' + encodeURIComponent(urlInput) + '&bot_id=' + encodeURIComponent(mockBotId) + '&name=Assistente%20Demo&color=3b82f6';
+            
+            document.getElementById('demo-link').href = demoLink;
+            document.getElementById('demo-link').textContent = demoLink;
+            document.getElementById('demo-result').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
