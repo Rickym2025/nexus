@@ -687,9 +687,9 @@
         </div>
     </div>
 
-    <!-- ════ SCRIPTS ════ -->
+    <!-- ════ SCRIPTS GENERALI E LOGICA DI NAVIGAZIONE ════ -->
     <script>
-    /* ─── Config ─── */
+    /* ─── Configurazione Globale ─── */
     const WEBHOOK_CHATBOT = 'https://n8n.rmstudio.app/webhook/chatbot-builder';
     const SESSION_KEY     = 'nexus_chat_session';
 
@@ -699,25 +699,25 @@
         sessionStorage.setItem(SESSION_KEY, chatSessionId);
     }
 
-    // Forza il bot ad essere aperto di default su PC e Tablet, chiuso su Mobile
+    // Il bot si apre di default su Desktop e Tablet, chiuso su Mobile per usabilità
     let chatIsOpen = window.innerWidth > 768;
 
-    /* Quick replies predefinite (Rimossa domanda n8n) */
+    /* Risposte rapide del bot (Risoluzione attrito cognitivo) */
     const QUICK_REPLIES = [
         { label: '💬 Come funziona?',           text: 'Come funziona NexusAI concretamente?' },
         { label: '💰 Quanto costa?',             text: 'Quali sono i prezzi e i piani disponibili?' },
-        { label: '⚡ Quanto ci vuole?',          text: 'Quanto tempo ci vuole per attivare il chatbot?' },
+        { label: '⚡ Quanto ci vuole?',          text: 'Quanto tempo ci vuole per attivare il chatbot?' }
     ];
 
-    /* Sequenza di benvenuto strutturata */
+    /* Sequenza di benvenuto con timing reale spaziato a 2 secondi */
     const WELCOME_SEQUENCE = [
         { text: 'Benvenuto nel futuro della conversione. ⚡' },
         { text: 'Sono <b>NexusAI</b>: il tuo agente commerciale autonomo.' },
         { text: 'Posso essere installato su <b>qualsiasi sito</b> in meno di 10 secondi.' },
-        { text: 'Cosa vuoi scoprire oggi? Scegli una domanda qui sotto o scrivimi. 👇' },
+        { text: 'Cosa vuoi scoprire oggi? Scegli una domanda qui sotto o scrivimi. 👇' }
     ];
 
-    /* Ciclo dinamico avatar */
+    /* Rotazione degli avatar del chatbot */
     const AVATARS = [
         "logo_nexus_bg.png",
         "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=100&q=80", // Ragazza
@@ -732,16 +732,16 @@
         
         setInterval(() => {
             currentAvatarIndex = (currentAvatarIndex + 1) % AVATARS.length;
-            avatarImg.style.opacity = '0'; // Dissolvenza in uscita
+            avatarImg.style.opacity = '0';
             
             setTimeout(() => {
                 avatarImg.src = AVATARS[currentAvatarIndex];
-                avatarImg.style.opacity = '1'; // Dissolvenza in entrata
+                avatarImg.style.opacity = '1';
             }, 300);
         }, 4000);
     }
 
-    /* DOM refs */
+    /* Riferimenti DOM */
     const win      = document.getElementById('nx-window');
     const bubble   = document.getElementById('nx-bubble');
     const closeBtn = document.getElementById('nx-close-btn');
@@ -761,10 +761,22 @@
         }
     }
 
+    // Registrazione eventi click
     bubble.addEventListener('click', toggleChat);
     closeBtn.addEventListener('click', toggleChat);
+    sendBtn.addEventListener('click', () => {
+        const txt = input.value.trim();
+        if (!txt) return;
+        sendNxMsg(txt);
+    });
+    input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+            const txt = input.value.trim();
+            if (txt) sendNxMsg(txt);
+        }
+    });
 
-    /* Inizializzazione automatica */
+    /* Avvio automatico all'avvio della pagina */
     document.addEventListener('DOMContentLoaded', () => {
         startAvatarCycle();
         if (chatIsOpen) {
@@ -774,7 +786,7 @@
         }
     });
 
-    /* Welcome sequence a coda temporizzata (2.2s di attesa dopo la fine di ogni messaggio) */
+    /* Sequenza di benvenuto sequenziale */
     function startWelcomeSequence() {
         let i = 0;
         function showNext() {
@@ -785,23 +797,20 @@
             const msg = WELCOME_SEQUENCE[i];
             const dotId = 'typing-seq-' + i;
             
-            // Mostra l'indicatore di scrittura
             addMsg('<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>', 'bot', dotId);
             
-            // Dopo 1 secondo di scrittura, stampa il messaggio
             setTimeout(() => {
                 const el = document.getElementById(dotId);
                 if (el) el.remove();
                 addMsg(msg.text, 'bot');
                 i++;
-                // Attende 2.2 secondi di pausa prima di avviare il prossimo indicatore di scrittura
                 setTimeout(showNext, 2200);
             }, 1000);
         }
         showNext();
     }
 
-    /* Quick replies */
+    /* Rendering risposte rapide */
     function renderQuickReplies() {
         qrBox.innerHTML = '';
         QUICK_REPLIES.forEach(({ label, text }) => {
@@ -810,25 +819,19 @@
             btn.textContent = label;
             btn.addEventListener('click', () => {
                 qrBox.innerHTML = ''; 
-                sendMessage(text);
+                sendNxMsg(text);
             });
             qrBox.appendChild(btn);
         });
     }
 
-    /* Send message */
-    sendBtn.addEventListener('click', () => {
-        const txt = input.value.trim();
-        if (!txt) return;
-        input.value = '';
-        qrBox.innerHTML = '';
-        sendMessage(txt);
-    });
-    input.addEventListener('keydown', e => {
-        if (e.key === 'Enter') sendBtn.click();
-    });
+    /* Invio messaggio unificato */
+    async function sendNxMsg(textOverride) {
+        const text = (textOverride || input.value).trim();
+        if (!text) return;
 
-    async function sendMessage(text) {
+        input.value = '';
+        qrBox.innerHTML = ''; // Nasconde le risposte rapide
         addMsg(text, 'user');
 
         const loadId = 'typing-send-' + Date.now();
@@ -869,6 +872,7 @@
         }
     }
 
+    /* Aggiunta messaggio all'interfaccia */
     function addMsg(html, sender, id) {
         const div = document.createElement('div');
         div.className = 'nx-msg ' + sender;
@@ -880,7 +884,7 @@
         msgBox.scrollTo({ top: msgBox.scrollHeight, behavior: 'smooth' });
     }
 
-    /* Simulatore di conversazione interattivo */
+    /* Simulatore di conversazione interattivo nella pagina */
     const SIM_RESPONSES = {
         prezzi: {
             user: "Come gestisci i prezzi?",
@@ -921,65 +925,60 @@
             simBox.appendChild(botDiv);
             simBox.scrollTop = simBox.scrollHeight;
         }, 1200);
-    
-}
-    /* Demo generator */
-        async function generateDemo() {
-    const urlRaw = document.getElementById('site-url').value.trim();
-    if (!urlRaw) { document.getElementById('site-url').focus(); return; }
-
-    /* Forza il protocollo corretto */
-    let url = urlRaw;
-    if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
-
-    const botId = 'demo_' + Math.random().toString(36).slice(2, 9);
-    
-    // Riferimenti grafici del bottone
-    const submitBtn = document.querySelector('#demo button');
-    const originalText = submitBtn.textContent;
-    
-    // Disabilita pulsante e mostra lo stato di analisi
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Analisi e addestramento AI (può richiedere 15s)...';
-
-    try {
-        // Chiamata diretta a n8n senza alcun timeout restrittivo lato browser
-        const res = await fetch('https://n8n.rmstudio.app/webhook/chatbot-creator', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                site_url: url,
-                bot_id: botId,
-                nome_struttura: 'Demo Client',
-                is_paid: false // Impostato su false per la demo gratuita (1 pagina)
-            })
-        });
-        
-        const data = await res.json();
-        
-        if (data.success && data.demo_url) {
-            const linkEl = document.getElementById('demo-link');
-            const resultDiv = document.getElementById('demo-result');
-            
-            linkEl.href = data.demo_url;
-            linkEl.textContent = data.demo_url;
-            resultDiv.classList.remove('hidden');
-        } else {
-            alert("Errore nell'analisi del sito. Riprova tra qualche istante.");
-        }
-    } catch(e) {
-        console.error(e);
-        alert("Il server sta completando l'analisi. Se il link non compare, attendi 5 secondi e riprova.");
-    } finally {
-        // Ripristina il pulsante
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalText;
     }
-}
 
-    /* Live counter */
+    /* Generazione della Demo con chiamata API asincrona reale */
+    async function generateDemo() {
+        const urlRaw = document.getElementById('site-url').value.trim();
+        if (!urlRaw) { document.getElementById('site-url').focus(); return; }
+
+        let url = urlRaw;
+        if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+
+        const botId = 'demo_' + Math.random().toString(36).slice(2, 9);
+        const submitBtn = document.querySelector('#demo button');
+        const originalText = submitBtn.textContent;
+        
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Analisi e addestramento AI (può richiedere 15s)...';
+
+        try {
+            const res = await fetch('https://n8n.rmstudio.app/webhook/chatbot-creator', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    site_url: url,
+                    bot_id: botId,
+                    nome_struttura: 'Demo Client',
+                    is_paid: false 
+                })
+            });
+            
+            const data = await res.json();
+            
+            if (data.success && data.demo_url) {
+                const linkEl = document.getElementById('demo-link');
+                const resultDiv = document.getElementById('demo-result');
+                
+                linkEl.href = data.demo_url;
+                linkEl.textContent = data.demo_url;
+                resultDiv.classList.remove('hidden');
+            } else {
+                alert("Errore nell'analisi del sito. Riprova tra qualche istante.");
+            }
+        } catch(e) {
+            console.error(e);
+            alert("Il server sta completando l'analisi. Se il link non compare, attendi 5 secondi e riprova.");
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
+    }
+
+    /* Contatore visite attive (Social Proof) */
     (function () {
-        const el   = document.getElementById('live-count');
+        const el = document.getElementById('live-count');
+        if (!el) return;
         setInterval(() => {
             const delta = Math.floor(Math.random() * 3) - 1; 
             const next  = Math.max(230, parseInt(el.textContent) + delta);
