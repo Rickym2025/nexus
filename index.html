@@ -17,7 +17,7 @@
                         brandCyan: '#06b6d4',
                         brandPurple: '#8b5cf6',
                         brandPink: '#ec4899',
-                        panelBg: 'rgba(10, 10, 15, 0.85)'
+                        panelBg: 'rgba(10, 10, 15, 0.92)'
                     },
                     fontFamily: {
                         sans: ['"DM Sans"', 'sans-serif'],
@@ -34,35 +34,36 @@
             background-color: #030307;
             color: #f4f4f5;
             font-family: 'DM Sans', sans-serif;
-            font-size: 16px;
+            font-size: 17px; /* Aumentata leggibilità globale */
         }
 
-        /* ── Glassmorphism ad alta leggibilità ── */
+        /* ── Glassmorphism leggero (Ottimizzato per performance video) ── */
         .glass-panel {
-            backdrop-filter: blur(20px);
-            background: rgba(8, 8, 12, 0.85);
+            backdrop-filter: blur(8px); /* Ridotto da 24px per non affaticare la GPU */
+            background: rgba(10, 10, 15, 0.92);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        /* ── Cornice Neon Cangiante (Rainbow Border) ── */
+        /* ── Cornice Neon Cangiante ad alta fluidità ── */
         @keyframes border-rainbow {
-            0%, 100% { border-color: #06b6d4; box-shadow: 0 0 25px rgba(6, 182, 212, 0.45); }
-            33%       { border-color: #8b5cf6; box-shadow: 0 0 25px rgba(139, 92, 246, 0.45); }
-            66%       { border-color: #ec4899; box-shadow: 0 0 25px rgba(236, 72, 153, 0.45); }
+            0%, 100% { border-color: #06b6d4; }
+            33%       { border-color: #8b5cf6; }
+            66%       { border-color: #ec4899; }
         }
         .animated-rainbow-border { 
             border-width: 2px;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.25); /* Ombra statica per non ricalcolare i pixel in movimento */
             animation: border-rainbow 8s infinite linear; 
         }
 
-        /* ── Scanline overlay ── */
+        /* ── Scanline overlay leggero ── */
         body::after {
             content: '';
             pointer-events: none;
             position: fixed;
             inset: 0;
             z-index: 999;
-            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.03) 2px, rgba(0,0,0,.03) 4px);
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.02) 2px, rgba(0,0,0,.02) 4px);
         }
 
         /* ── Grain texture ── */
@@ -73,7 +74,7 @@
             border-radius: inherit;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
             pointer-events: none;
-            opacity: .35;
+            opacity: .25;
         }
 
         /* ── Page-load fade-in ── */
@@ -89,11 +90,13 @@
         @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
         .ticker-track { display: flex; gap: 0; animation: ticker 25s linear infinite; white-space: nowrap; }
 
-        /* ── Video GPU hack ── */
+        /* ── Video GPU acceleration hack ── */
         video {
             transform: translate3d(0,0,0);
             backface-visibility: hidden;
             will-change: transform;
+            -webkit-perspective: 1000;
+            perspective: 1000;
         }
 
         /* ── Chatbot config ── */
@@ -205,18 +208,6 @@
         }
         .nx-input-area button:hover { opacity: .9; transform: scale(1.03); }
 
-        /* Typing dots */
-        .typing-dot {
-            width: 5px; height: 5px;
-            background: var(--cyan); border-radius: 50%;
-            display: inline-block;
-            animation: nxtyping 1.4s infinite ease-in-out;
-            margin-right: 2px;
-        }
-        .typing-dot:nth-child(2) { animation-delay: .2s; }
-        .typing-dot:nth-child(3) { animation-delay: .4s; }
-        @keyframes nxtyping { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-5px)} }
-
         @media (max-width: 450px) {
             #nx-window { width: calc(100% - 36px); left: 18px; bottom: 100px; }
             #nx-bubble { bottom: 22px; left: 18px; }
@@ -225,7 +216,7 @@
 </head>
 <body class="antialiased min-h-screen flex flex-col overflow-x-hidden">
 
-    <!-- Background video -->
+    <!-- Background video fludio -->
     <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
         <video autoplay loop muted playsinline preload="auto" class="w-full h-full object-cover opacity-20">
             <source src="background.mp4" type="video/mp4">
@@ -240,11 +231,11 @@
                 <img src="logo_nexus_bg.png" alt="NexusAI Logo" class="w-8 h-8 object-contain animate-pulse">
                 <span class="font-black tracking-[0.2em] text-base uppercase font-mono text-white">NexusAI</span>
             </div>
-            <nav class="hidden md:flex items-center gap-7 text-xs text-zinc-300 font-bold uppercase tracking-widest">
-                <a href="#come-funziona" class="hover:text-white transition-colors">Come Funziona</a>
-                <a href="#demo-azione"   class="hover:text-white transition-colors">In Azione</a>
-                <a href="#ecosistema"    class="hover:text-white transition-colors">Ecosistema</a>
-                <a href="#pricing"       class="hover:text-white transition-colors">Prezzi</a>
+            <nav class="hidden md:flex items-center gap-7 text-xs text-zinc-200 font-bold uppercase tracking-widest">
+                <a href="#come-funziona" class="hover:text-white transition-colors font-sans text-sm">Come Funziona</a>
+                <a href="#demo-azione"   class="hover:text-white transition-colors font-sans text-sm">In Azione</a>
+                <a href="#ecosistema"    class="hover:text-white transition-colors font-sans text-sm">Ecosistema</a>
+                <a href="#pricing"       class="hover:text-white transition-colors font-sans text-sm">Prezzi</a>
             </nav>
             <a href="#demo" class="text-[9px] font-black uppercase tracking-widest text-brandCyan hover:text-cyan-300 transition-colors border border-brandCyan/30 px-5 py-2.5 rounded-full bg-brandCyan/5 hover:bg-brandCyan/10">
                 Prova Gratis
@@ -258,50 +249,50 @@
         <section class="min-h-screen flex flex-col items-center justify-center px-6 pt-32 pb-20 text-center">
             <div class="max-w-4xl mx-auto">
 
-                <!-- Live counter – social proof + scarcity -->
+                <!-- Live counter – social proof -->
                 <div class="flex items-center justify-center gap-2 mb-8 fade-up delay-1">
                     <span class="w-2.5 h-2.5 rounded-full bg-green-400 shadow-[0_0_12px_#4ade80] animate-pulse"></span>
-                    <span class="font-mono text-xs text-zinc-300 uppercase tracking-widest">
+                    <span class="font-mono text-sm text-zinc-200 uppercase tracking-widest">
                         <span id="live-count" class="font-bold text-white">247</span> siti attivi in questo momento
                     </span>
                 </div>
 
-                <h1 class="text-5xl md:text-[4.2rem] font-black tracking-tight leading-[1.05] mb-8 fade-up delay-2">
+                <h1 class="text-5xl md:text-[4.5rem] font-black tracking-tight leading-[1.05] mb-8 fade-up delay-2">
                     Il 98% dei tuoi visitatori esce.<br>
                     <span class="text-transparent bg-clip-text bg-gradient-to-r from-brandCyan via-blue-400 to-brandPurple">
                         Inizia a vendere parlando.
                     </span>
                 </h1>
 
-                <p class="text-base md:text-xl text-zinc-300 max-w-2xl mx-auto mb-14 font-light leading-relaxed fade-up delay-3">
-                    Le persone abbandonano i siti vetrina perché richiedono uno sforzo attivo di lettura.
-                    <strong class="text-white">NexusAI</strong> elimina l'attrito cognitivo e converte i visitatori passivi in clienti paganti.
+                <p class="text-lg md:text-2xl text-zinc-200 max-w-2xl mx-auto mb-14 font-light leading-relaxed fade-up delay-3">
+                    Le persone abbandonano i siti vetrina perché richiedono sforzo attivo di lettura.
+                    <strong class="text-white font-medium">NexusAI</strong> elimina l'attrito cognitivo e converte i visitatori passivi in lead reali.
                 </p>
 
-                <!-- Demo generator (Neon Highlight Box) -->
-                <div id="demo" class="w-full max-w-lg mx-auto p-8 bg-zinc-950/90 rounded-[2rem] text-left border-2 border-brandCyan/40 shadow-[0_0_50px_rgba(6,182,212,0.15)] relative fade-up delay-4">
-                    <div class="absolute -top-3.5 right-8 bg-brandCyan text-black text-[9px] font-black px-4 py-1 rounded-full uppercase tracking-widest shadow-md">
-                        Test Istantaneo
+                <!-- Demo generator (Neon Highlight Box - High Legibility) -->
+                <div id="demo" class="w-full max-w-lg mx-auto p-8 bg-zinc-950 rounded-[2rem] text-left border-2 border-brandCyan/50 shadow-[0_0_50px_rgba(6,182,212,0.18)] relative fade-up delay-4">
+                    <div class="absolute -top-3.5 right-8 bg-brandCyan text-black text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-widest shadow-md">
+                        Test Istantaneo (Prima Pagina)
                     </div>
-                    <h3 class="text-lg font-bold text-white mb-2">Guarda l'AI impossessarsi del tuo sito</h3>
-                    <p class="text-sm text-zinc-400 mb-6 leading-relaxed">Inserisci l'URL: lo analizziamo, lo comprendiamo, lo attiviamo.</p>
+                    <h3 class="text-xl font-bold text-white mb-2">Guarda l'AI impossessarsi del tuo sito</h3>
+                    <p class="text-sm text-zinc-300 mb-6 leading-relaxed">Inserisci l'URL: lo analizziamo, estraiamo le informazioni chiave della tua <strong>home page</strong> e lo attiviamo.</p>
 
                     <div class="space-y-5">
                         <div>
-                            <label class="block text-xs uppercase font-black tracking-widest text-zinc-300 mb-2">Il tuo Sito Web</label>
+                            <label class="block text-xs uppercase font-black tracking-widest text-zinc-200 mb-2">Il tuo Sito Web</label>
                             <input type="url" id="site-url" placeholder="https://tuosito.com"
-                                class="w-full bg-black border border-zinc-700 text-white rounded-xl px-4 py-3 text-sm outline-none focus:border-brandCyan transition-colors">
+                                class="w-full bg-black border border-zinc-700 text-white rounded-xl px-4 py-3.5 text-base outline-none focus:border-brandCyan transition-colors">
                         </div>
-                        <button onclick="generateDemo()" class="w-full bg-brandCyan text-black font-black py-3.5 rounded-xl text-xs hover:bg-cyan-400 transition uppercase tracking-widest active:scale-95">
+                        <button onclick="generateDemo()" class="w-full bg-brandCyan text-black font-black py-4 rounded-xl text-xs hover:bg-cyan-400 transition uppercase tracking-widest active:scale-95">
                             Genera Demo Live →
                         </button>
                     </div>
 
                     <div id="demo-result" class="mt-6 pt-5 border-t border-zinc-800/80 hidden">
-                        <p class="text-xs text-zinc-300 mb-2 font-bold uppercase tracking-wider">La tua anteprima interattiva è pronta:</p>
+                        <p class="text-xs text-zinc-200 mb-2 font-bold uppercase tracking-wider">La tua anteprima interattiva è pronta:</p>
                         <div class="p-3 bg-zinc-900 border border-zinc-800 rounded-xl">
                             <a id="demo-link" href="#" target="_blank"
-                                class="text-xs text-brandCyan underline break-all font-mono hover:text-cyan-300 transition-colors"></a>
+                                class="text-sm text-brandCyan underline break-all font-mono hover:text-cyan-300 transition-colors font-bold"></a>
                         </div>
                     </div>
                 </div>
@@ -338,19 +329,19 @@
                         <div class="absolute -right-6 -top-6 text-8xl font-black text-white/[0.03] select-none group-hover:text-white/[0.06] transition">01</div>
                         <span class="text-3xl mb-4 block">🔍</span>
                         <h3 class="text-lg font-bold text-white mb-2">Scraping & Comprensione</h3>
-                        <p class="text-sm text-zinc-400 leading-relaxed">Il motore scansiona e organizza automaticamente i contenuti del tuo sito, digerendone la voce e i prodotti.</p>
+                        <p class="text-sm text-zinc-300 leading-relaxed">Il motore scansiona e organizza automaticamente i contenuti del tuo sito, digerendone la voce e i prodotti.</p>
                     </div>
                     <div class="p-8 glass-panel rounded-2xl relative overflow-hidden group hover:border-brandCyan/20 transition-all">
                         <div class="absolute -right-6 -top-6 text-8xl font-black text-white/[0.03] select-none group-hover:text-white/[0.06] transition">02</div>
                         <span class="text-3xl mb-4 block">🧠</span>
                         <h3 class="text-lg font-bold text-white mb-2">Allineamento Cognitivo</h3>
-                        <p class="text-sm text-zinc-400 leading-relaxed">Generiamo regole comportamentali strutturate perché l'AI parli esattamente con il tuo tono di voce.</p>
+                        <p class="text-sm text-zinc-300 leading-relaxed">Generiamo regole comportamentali strutturate perché l'AI parli esattamente con il tuo tono di voce.</p>
                     </div>
                     <div class="p-8 glass-panel rounded-2xl relative overflow-hidden group hover:border-brandCyan/20 transition-all">
                         <div class="absolute -right-6 -top-6 text-8xl font-black text-white/[0.03] select-none group-hover:text-white/[0.06] transition">03</div>
                         <span class="text-3xl mb-4 block">🔌</span>
                         <h3 class="text-lg font-bold text-white mb-2">Tag Singolo</h3>
-                        <p class="text-sm text-zinc-400 leading-relaxed">Una riga di codice nel tuo HTML. Tutto il carico computazionale rimane sulla nostra infrastruttura.</p>
+                        <p class="text-sm text-zinc-300 leading-relaxed">Una riga di codice nel tuo HTML. Tutto il carico computazionale rimane sulla nostra infrastruttura europea.</p>
                     </div>
                 </div>
             </div>
@@ -360,15 +351,15 @@
         <section class="py-32 px-6 border-t border-white/5 bg-zinc-950/20 relative z-10">
             <div class="max-w-5xl mx-auto">
                 <p class="font-mono text-xs text-brandPurple uppercase tracking-[5px] mb-4 text-center">La scienza della conversione</p>
-                <h2 class="text-3xl md:text-5xl font-black text-center tracking-tighter mb-16 uppercase">Il costo della NON azione</h2>
+                <h2 class="text-3xl md:text-5xl font-black text-center tracking-tighter mb-16 uppercase">Il costo della Non Azione</h2>
 
                 <div class="grid md:grid-cols-2 gap-8">
-                    <!-- Pain Column (Sito statico) -->
+                    <!-- Pain Column -->
                     <div class="p-8 bg-zinc-950 border border-red-500/10 rounded-3xl relative overflow-hidden">
                         <div class="absolute top-0 right-0 w-32 h-32 bg-red-500/5 blur-2xl rounded-full"></div>
                         <span class="text-xs uppercase tracking-widest font-black text-red-500 mb-4 block">Senza NexusAI (Sito Tradizionale)</span>
-                        <h4 class="text-xl font-bold text-zinc-300 mb-6">Un imbuto di vendite interrotto</h4>
-                        <ul class="space-y-4 text-sm text-zinc-400">
+                        <h4 class="text-xl font-bold text-zinc-200 mb-6">Un imbuto di vendite interrotto</h4>
+                        <ul class="space-y-4 text-sm text-zinc-300">
                             <li class="flex items-start gap-3">
                                 <span class="text-red-500 mt-1">✕</span>
                                 <span><strong>Friction Elevata:</strong> L'utente deve cercare attivamente le risposte navigando tra le pagine.</span>
@@ -384,12 +375,12 @@
                         </ul>
                     </div>
 
-                    <!-- Pleasure Column (Sito attivo) -->
+                    <!-- Pleasure Column -->
                     <div class="p-8 bg-zinc-950 border-2 border-brandCyan/25 rounded-3xl relative overflow-hidden shadow-[0_0_40px_rgba(6,182,212,0.06)]">
                         <div class="absolute top-0 right-0 w-32 h-32 bg-brandCyan/10 blur-2xl rounded-full"></div>
                         <span class="text-xs uppercase tracking-widest font-black text-brandCyan mb-4 block">Con NexusAI (Conversione Attiva)</span>
                         <h4 class="text-xl font-bold text-white mb-6">L'azzeramento dell'attrito cognitivo</h4>
-                        <ul class="space-y-4 text-sm text-zinc-200">
+                        <ul class="space-y-4 text-sm text-zinc-100">
                             <li class="flex items-start gap-3">
                                 <span class="text-brandCyan mt-1">✓</span>
                                 <span><strong>Ingaggio Istantaneo:</strong> L'AI inizia la conversazione sollevando l'utente dallo sforzo di lettura.</span>
@@ -408,15 +399,15 @@
             </div>
         </section>
 
-        <!-- ═══ SEZIONE INTERATTIVA: VEDI IL BOT IN AZIONE ═══ -->
+        <!-- ═══ SEZIONE INTERATTIVA: SIMULATORE DI CHAT (SOSTITUTO VIDEO) ═══ -->
         <section id="demo-azione" class="py-32 px-6 border-t border-white/5 relative z-10">
             <div class="max-w-5xl mx-auto">
-                <p class="font-mono text-xs text-brandCyan uppercase tracking-[5px] mb-4 text-center">Simulatore</p>
+                <p class="font-mono text-xs text-brandCyan uppercase tracking-[5px] mb-4 text-center">In Azione</p>
                 <h2 class="text-3xl md:text-5xl font-black text-center tracking-tighter mb-4 uppercase">Simula una conversazione</h2>
-                <p class="text-sm text-zinc-400 text-center mb-16 max-w-md mx-auto">Fai clic su una delle domande per vedere come l'AI gestisce un visitatore reale sul tuo sito.</p>
+                <p class="text-base text-zinc-300 text-center mb-16 max-w-md mx-auto">Fai clic su una delle domande per vedere come l'AI gestisce un visitatore reale sul tuo sito.</p>
 
                 <!-- Static Console Chat Simulator -->
-                <div class="max-w-2xl mx-auto bg-[#0a0a0f] border-2 border-brandCyan/20 rounded-[2rem] overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+                <div class="max-w-2xl mx-auto bg-[#0a0a0f] border-2 border-brandCyan/30 rounded-[2rem] overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)]">
                     <div class="bg-zinc-950 px-6 py-4 border-b border-white/5 flex items-center justify-between">
                         <div class="flex items-center gap-3">
                             <img src="logo_nexus_bg.png" class="w-7 h-7 object-contain" alt="">
@@ -427,7 +418,7 @@
 
                     <div id="sim-messages" class="p-6 h-[280px] overflow-y-auto flex flex-col gap-4 bg-[#030306]">
                         <div class="nx-msg bot">
-                            Ciao! Sono l'assistente demo. Fai clic su uno dei pulsanti in basso per simulare una richiesta reale del cliente. 👇
+                            Ciao! Sono l'assistente demo di NexusAI. Fai clic su uno dei pulsanti in basso per simulare una richiesta reale del cliente. 👇
                         </div>
                     </div>
 
@@ -452,7 +443,7 @@
                         <div>
                             <span class="text-[10px] uppercase tracking-[3px] font-black text-orange-400">Hospitality</span>
                             <h3 class="text-xl font-bold mt-2 mb-3 text-white">Concierge24</h3>
-                            <p class="text-sm text-zinc-400 leading-relaxed mb-6">Assistente vocale e testuale AI H24 ("Giulia") per hotel e strutture extra-ricettive.</p>
+                            <p class="text-sm text-zinc-300 leading-relaxed mb-6">Assistente vocale e testuale AI H24 ("Giulia") per hotel e strutture extra-ricettive.</p>
                         </div>
                         <span class="text-xs font-black uppercase text-brandCyan group-hover:underline">Visita →</span>
                     </a>
@@ -462,7 +453,7 @@
                         <div>
                             <span class="text-[10px] uppercase tracking-[3px] font-black text-blue-400">Automotive AI</span>
                             <h3 class="text-xl font-bold mt-2 mb-3 text-white">DriveMotion AI</h3>
-                            <p class="text-sm text-zinc-400 leading-relaxed mb-6">Trasforma le foto del piazzale del concessionario in video cinematici pronti per i social.</p>
+                            <p class="text-sm text-zinc-300 leading-relaxed mb-6">Trasforma le foto del piazzale del concessionario in video cinematici pronti per i social.</p>
                         </div>
                         <span class="text-xs font-black uppercase text-brandCyan group-hover:underline">Visita →</span>
                     </a>
@@ -472,7 +463,7 @@
                         <div>
                             <span class="text-[10px] uppercase tracking-[3px] font-black text-green-400">Real Estate</span>
                             <h3 class="text-xl font-bold mt-2 mb-3 text-white">HomeTour AI</h3>
-                            <p class="text-sm text-zinc-400 leading-relaxed mb-6">Reel immobiliari completi di voce narrante generati in automatico a partire da semplici foto.</p>
+                            <p class="text-sm text-zinc-300 leading-relaxed mb-6">Reel immobiliari completi di voce narrante generati in automatico a partire da semplici foto.</p>
                         </div>
                         <span class="text-xs font-black uppercase text-brandCyan group-hover:underline">Visita →</span>
                     </a>
@@ -482,7 +473,7 @@
                         <div>
                             <span class="text-[10px] uppercase tracking-[3px] font-black text-purple-400">Privacy AI</span>
                             <h3 class="text-xl font-bold mt-2 mb-3 text-white">OmniaStudio</h3>
-                            <p class="text-sm text-zinc-400 leading-relaxed mb-6">La potenza dell'AI generativa locale e offline per la massima riservatezza dello studio.</p>
+                            <p class="text-sm text-zinc-300 leading-relaxed mb-6">La potenza dell'AI generativa locale e offline per la massima riservatezza dello studio.</p>
                         </div>
                         <span class="text-xs font-black uppercase text-brandCyan group-hover:underline">Visita →</span>
                     </a>
@@ -539,13 +530,13 @@
                         <p class="text-xs text-zinc-400 mb-6 leading-relaxed">Per hotel, agenzie e siti aziendali.</p>
                         <div class="mb-7 flex items-end gap-2">
                             <span class="text-4xl font-black text-white">€49</span>
-                            <span class="text-zinc-500 text-xs pb-1">/ mese</span>
+                            <span class="text-zinc-600 text-xs pb-1">/ mese</span>
                         </div>
                         <ul class="text-xs text-zinc-300 space-y-3 mb-8">
                             <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> 1 Chatbot attivo sul tuo sito</li>
+                            <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> <strong>Scansione fino a 10 pagine</strong> del tuo sito</li>
                             <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> Messaggi e lead illimitati</li>
                             <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> Allineamento estetico e colore Hex</li>
-                            <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> Integrazione API n8n inclusa</li>
                         </ul>
                         <button onclick="alert('Integrazione Stripe attiva')"
                             class="w-full bg-white text-black font-black py-3 rounded-xl text-xs uppercase tracking-widest hover:bg-neutral-100 transition active:scale-95">
@@ -556,14 +547,14 @@
                     <!-- Custom -->
                     <div class="p-8 glass-panel rounded-3xl opacity-80 hover:opacity-100 transition-opacity">
                         <h3 class="text-base font-bold text-white mb-1">Custom Hub</h3>
-                        <p class="text-xs text-zinc-500 mb-6 leading-relaxed">Ecosistemi complessi con integrazioni CRM.</p>
+                        <p class="text-xs text-zinc-500 mb-6 leading-relaxed">Ecosistemi complessi per portali corposi.</p>
                         <div class="mb-7 flex items-end gap-2">
                             <span class="text-4xl font-black text-white">€199</span>
                             <span class="text-zinc-600 text-xs pb-1">/ mese</span>
                         </div>
                         <ul class="text-xs text-zinc-300 space-y-3 mb-8">
                             <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> Fino a 5 chatbot contemporanei</li>
-                            <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> Allineamento cognitivo multi-pagina</li>
+                            <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> <strong>Scansione profonda (+10 pagine o PDF)</strong></li>
                             <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> Supporto tecnico dedicato su WhatsApp</li>
                             <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> Webhook verso il tuo CRM</li>
                         </ul>
@@ -632,7 +623,7 @@
                     <span class="font-mono text-white">Nexus<span class="text-brandCyan italic">AI</span></span>
                 </div>
                 <p class="text-zinc-500 text-xs leading-relaxed">Ingegneria dei Sistemi Autonomi.<br>Sviluppato da RM Studio.</p>
-                <p class="text-zinc-600 text-[10px] mt-5">© 2026 RM Studio. Tutti i diritti riservati.</p>
+                <p class="text-zinc-700 text-[10px] mt-5">© 2026 RM Studio. Tutti i diritti riservati.</p>
             </div>
 
             <div class="flex flex-col items-center md:items-start gap-3">
@@ -649,7 +640,7 @@
                 </div>
             </div>
 
-            <div class="flex flex-col items-center md:items-end gap-2">
+            <div class="flex flex-col items-center md:items-end gap-2 text-center md:text-right">
                 <h4 class="text-white font-black text-[9px] uppercase tracking-widest mb-3">Supporto</h4>
                 <a href="#contatti"
                     class="bg-white/8 hover:bg-white/15 border border-white/15 text-white px-6 py-2 rounded-full text-xs font-bold transition-all">
@@ -673,7 +664,10 @@
     <div id="nx-window" class="animated-rainbow-border">
         <div class="nx-header">
             <div style="display:flex;align-items:center;gap:12px;">
-                <img src="logo_nexus_bg.png" style="width:28px;height:28px;object-fit:contain;" alt="NexusAI">
+                <div style="width:28px;height:28px;position:relative;">
+                    <!-- Avatar dinamico con dissolvenza morbida -->
+                    <img id="nx-avatar" src="logo_nexus_bg.png" style="width:28px;height:28px;object-fit:contain;transition:opacity 0.3s;" alt="NexusAI">
+                </div>
                 <div style="display:flex;flex-direction:column;">
                     <span style="font-size:13px;font-weight:800;letter-spacing:1px;font-family:'Space Mono',monospace;color:#fff;">NexusAI Pilot</span>
                     <span style="font-size:10px;color:var(--green);font-weight:600;letter-spacing:.03em;">● Attivo e online</span>
@@ -708,21 +702,44 @@
     // Forza il bot ad essere aperto di default su PC e Tablet, chiuso su Mobile
     let chatIsOpen = window.innerWidth > 768;
 
-    /* Quick replies predefinite */
+    /* Quick replies predefinite (Rimossa domanda n8n) */
     const QUICK_REPLIES = [
         { label: '💬 Come funziona?',           text: 'Come funziona NexusAI concretamente?' },
         { label: '💰 Quanto costa?',             text: 'Quali sono i prezzi e i piani disponibili?' },
         { label: '⚡ Quanto ci vuole?',          text: 'Quanto tempo ci vuole per attivare il chatbot?' },
-        { label: '🔌 Funziona con n8n?',         text: 'Come si integra con n8n e i miei workflow?' },
     ];
 
-    /* Sequenza di benvenuto con timing di 2 secondi spaccati */
+    /* Sequenza di benvenuto strutturata */
     const WELCOME_SEQUENCE = [
-        { text: 'Benvenuto nel futuro della conversione. ⚡', delay: 800  },
-        { text: 'Sono <b>NexusAI</b>: il tuo agente commerciale autonomo.',     delay: 2800 },
-        { text: 'Posso essere installato su <b>qualsiasi sito</b> in meno di 10 secondi.', delay: 4800 },
-        { text: 'Cosa vuoi scoprire oggi? Scegli una domanda qui sotto. 👇',         delay: 6800 },
+        { text: 'Benvenuto nel futuro della conversione. ⚡' },
+        { text: 'Sono <b>NexusAI</b>: il tuo agente commerciale autonomo.' },
+        { text: 'Posso essere installato su <b>qualsiasi sito</b> in meno di 10 secondi.' },
+        { text: 'Cosa vuoi scoprire oggi? Scegli una domanda qui sotto o scrivimi. 👇' },
     ];
+
+    /* Ciclo dinamico avatar */
+    const AVATARS = [
+        "logo_nexus_bg.png",
+        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=100&q=80", // Ragazza
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&h=100&q=80", // Ragazzo
+        "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=100&h=100&q=80"  // Robot
+    ];
+    let currentAvatarIndex = 0;
+
+    function startAvatarCycle() {
+        const avatarImg = document.getElementById('nx-avatar');
+        if (!avatarImg) return;
+        
+        setInterval(() => {
+            currentAvatarIndex = (currentAvatarIndex + 1) % AVATARS.length;
+            avatarImg.style.opacity = '0'; // Dissolvenza in uscita
+            
+            setTimeout(() => {
+                avatarImg.src = AVATARS[currentAvatarIndex];
+                avatarImg.style.opacity = '1'; // Dissolvenza in entrata
+            }, 300);
+        }, 4000);
+    }
 
     /* DOM refs */
     const win      = document.getElementById('nx-window');
@@ -749,6 +766,7 @@
 
     /* Inizializzazione automatica */
     document.addEventListener('DOMContentLoaded', () => {
+        startAvatarCycle();
         if (chatIsOpen) {
             win.style.display = 'flex';
             win.classList.add('open');
@@ -756,25 +774,31 @@
         }
     });
 
-    /* Welcome sequence */
+    /* Welcome sequence a coda temporizzata (2.2s di attesa dopo la fine di ogni messaggio) */
     function startWelcomeSequence() {
-        WELCOME_SEQUENCE.forEach(({ text, delay }, i) => {
-            const isLast = i === WELCOME_SEQUENCE.length - 1;
-
-            /* typing indicator */
+        let i = 0;
+        function showNext() {
+            if (i >= WELCOME_SEQUENCE.length) {
+                renderQuickReplies();
+                return;
+            }
+            const msg = WELCOME_SEQUENCE[i];
+            const dotId = 'typing-seq-' + i;
+            
+            // Mostra l'indicatore di scrittura
+            addMsg('<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>', 'bot', dotId);
+            
+            // Dopo 1 secondo di scrittura, stampa il messaggio
             setTimeout(() => {
-                const dotId = 'typing-' + i;
-                addMsg('<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>', 'bot', dotId);
-            }, delay - 400);
-
-            /* actual message */
-            setTimeout(() => {
-                const el = document.getElementById('typing-' + i);
+                const el = document.getElementById(dotId);
                 if (el) el.remove();
-                addMsg(text, 'bot');
-                if (isLast) renderQuickReplies();
-            }, delay);
-        });
+                addMsg(msg.text, 'bot');
+                i++;
+                // Attende 2.2 secondi di pausa prima di avviare il prossimo indicatore di scrittura
+                setTimeout(showNext, 2200);
+            }, 1000);
+        }
+        showNext();
     }
 
     /* Quick replies */
@@ -856,15 +880,15 @@
         msgBox.scrollTo({ top: msgBox.scrollHeight, behavior: 'smooth' });
     }
 
-    /* Simulatore di conversazione interattivo nella pagina */
+    /* Simulatore di conversazione interattivo */
     const SIM_RESPONSES = {
         prezzi: {
             user: "Come gestisci i prezzi?",
-            bot: "NexusAI costa solo <b>49€/mese</b> per il piano Standard. Questo include un bot, messaggi illimitati e la personalizzazione grafica totale per integrarsi sul tuo sito."
+            bot: "NexusAI costa solo <b>49€/mese</b> per il piano Standard. Questo include un bot, la scansione automatica fino a 10 pagine del tuo sito e la personalizzazione grafica totale."
         },
         attivazione: {
             user: "È difficile da attivare?",
-            bot: "Zero complicazioni. Ti forniamo un **tag HTML di una sola riga** da copiare e incollare prima del tag di chiusura body. Funziona immediatamente su qualsiasi piattaforma (WordPress, Shopify, Webflow)."
+            bot: "Zero complicazioni. Ti forniamo un **tag HTML di una sola riga** da copiare e incollare prima del tag di chiusura body. Funziona immediatamente su WordPress, Shopify o Webflow."
         },
         sicurezza: {
             user: "I dati sono al sicuro?",
@@ -877,10 +901,8 @@
         const data = SIM_RESPONSES[key];
         if (!data) return;
 
-        // Pulisce la simulazione e mostra la domanda dell'utente
         simBox.innerHTML = `<div class="nx-msg user">${data.user}</div>`;
         
-        // Crea indicatore di scrittura
         const loadingId = 'sim-loading';
         const loadDiv = document.createElement('div');
         loadDiv.className = 'nx-msg bot';
