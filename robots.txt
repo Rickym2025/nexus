@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /config.html
+Disallow: /success.html
+
+Sitemap: https://nexus.rmstudio.app/sitemap.xml
