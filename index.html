@@ -907,20 +907,32 @@
 
     /* Aggiunta messaggio all'interfaccia */
     function addMsg(text, sender, id) {
-            const div = document.createElement('div');
-            div.className = 'nx-msg ' + sender;
-            if (id) div.id = id;
-            
-            let formattedText = text.replace(/\\n/g, '<br>');
-            formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            
-            // NUOVO: Rende i link cliccabili anche sulla Landing Page
-            formattedText = formattedText.replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g, '<a href="$2" target="_blank" style="text-decoration: underline; font-weight: bold;">$1</a>');
-            
-            div.innerHTML = formattedText;
-            messagesDiv.appendChild(div);
-            messagesDiv.scrollTo({ top: messagesDiv.scrollHeight, behavior: 'smooth' });
-        }
+        // RETE DI SICUREZZA: Se il testo non esiste, ferma la funzione per evitare crash
+        if (!text) return;
+        
+        // Assicuriamoci che sia trattato come testo puro
+        let formattedText = String(text);
+        
+        const div = document.createElement('div');
+        div.className = 'nx-msg ' + sender;
+        if (id) div.id = id;
+        
+        // 1. A capo
+        formattedText = formattedText.replace(/\\n/g, '<br>');
+        formattedText = formattedText.replace(/\n/g, '<br>'); // Cattura anche gli a capo reali
+        
+        // 2. Grassetto
+        formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        // 3. Link cliccabili (con colore azzurro brandCyan)
+        formattedText = formattedText.replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g, '<a href="$2" target="_blank" style="text-decoration: underline; font-weight: bold; color: #06b6d4;">$1</a>');
+        
+        div.innerHTML = formattedText;
+        messagesDiv.appendChild(div);
+        messagesDiv.scrollTo({ top: messagesDiv.scrollHeight, behavior: 'smooth' });
+    }
+
+    /* Simulatore di conversazione interattivo nella pagina */
 
     /* Simulatore di conversazione interattivo nella pagina */
     const SIM_RESPONSES = {
