@@ -24,85 +24,124 @@
     <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/10 blur-[120px] rounded-full pointer-events-none"></div>
     <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 blur-[120px] rounded-full pointer-events-none"></div>
 
-    <div class="max-w-md w-full p-8 glass-panel rounded-[2rem] relative z-10 border border-white/10 shadow-2xl">
+    <!-- Modulo allargato per una migliore leggibilità dei testi -->
+    <div class="max-w-lg w-full p-10 glass-panel rounded-[2.5rem] relative z-10 border border-white/10 shadow-2xl">
         <div class="text-center mb-8">
-            <img src="logo_nexus_bg.png" alt="NexusAI Logo" class="w-12 h-12 mx-auto mb-4 animate-pulse">
-            <h1 class="text-2xl font-black text-white uppercase tracking-wider">Configura il tuo Bot</h1>
-            <p class="text-xs text-zinc-400 mt-2">Personalizza l'assistente sul tuo sito in tempo reale, senza toccare il codice.</p>
+            <img src="logo_nexus_bg.png" alt="NexusAI Logo" class="w-14 h-14 mx-auto mb-4 animate-pulse rounded-lg">
+            <h1 class="text-3xl font-black text-white uppercase tracking-wider">Configura il tuo Bot</h1>
+            <p class="text-sm text-zinc-400 mt-2 leading-relaxed">Verifica le informazioni già estratte dal tuo sito e personalizza il comportamento dell'assistente in tempo reale.</p>
         </div>
 
-        <form id="config-form" onsubmit="saveConfiguration(event)" class="space-y-5">
+        <form id="config-form" onsubmit="saveConfiguration(event)" class="space-y-6">
             <!-- ID del Bot (Disabilitato, viene preso in automatico dall'URL) -->
             <div>
-                <label class="block text-[10px] uppercase font-bold tracking-widest text-zinc-400 mb-1.5">ID Identificativo Bot</label>
+                <label class="block text-xs uppercase font-bold tracking-widest text-zinc-400 mb-1.5">ID Identificativo Bot</label>
                 <input type="text" id="bot-id" readonly required
-                    class="w-full bg-zinc-950/50 border border-zinc-800 text-zinc-500 rounded-xl px-4 py-3 text-sm outline-none cursor-not-allowed font-mono">
+                    class="w-full bg-zinc-950/50 border border-zinc-800 text-zinc-500 rounded-xl px-4 py-3 text-base outline-none cursor-not-allowed font-mono">
             </div>
 
             <!-- Nome del Bot -->
             <div>
-                <label class="block text-[10px] uppercase font-bold tracking-widest text-zinc-300 mb-1.5">Nome dell'Assistente (es. Elena)</label>
+                <label class="block text-xs uppercase font-bold tracking-widest text-zinc-300 mb-1.5">Nome dell'Assistente (es. Elena)</label>
                 <input type="text" id="bot-name" required placeholder="Inserisci il nome del bot..."
-                    class="w-full bg-black border border-zinc-850 text-white rounded-xl px-4 py-3 text-sm outline-none focus:border-cyan-500 transition-colors">
+                    class="w-full bg-black border border-zinc-800 text-white rounded-xl px-4 py-3.5 text-base outline-none focus:border-cyan-500 transition-colors">
             </div>
 
             <!-- Colore Hex del Brand (Con Color Picker Sincronizzato) -->
             <div>
-                <label class="block text-[10px] uppercase font-bold tracking-widest text-zinc-300 mb-1.5">Colore del Brand</label>
+                <label class="block text-xs uppercase font-bold tracking-widest text-zinc-300 mb-1.5">Colore del Brand (Estratto automaticamente)</label>
                 <div class="flex gap-2">
                     <input type="text" id="colore_hex" name="colore_hex" maxlength="6" oninput="updateColorPicker(this.value)"
-                        class="flex-1 bg-black border border-zinc-850 text-white rounded-xl px-4 py-3 text-sm outline-none focus:border-cyan-500 transition-colors" 
+                        class="flex-1 bg-black border border-zinc-800 text-white rounded-xl px-4 py-3.5 text-base outline-none focus:border-cyan-500 transition-colors" 
                         placeholder="Codice Hex es. 06b6d4">
-                    <!-- Color picker interattivo -->
                     <input type="color" id="color-picker" oninput="updateColorHex(this.value)"
-                        class="w-14 h-[46px] bg-black border border-zinc-850 rounded-xl p-1 cursor-pointer">
+                        class="w-16 h-[50px] bg-black border border-zinc-800 rounded-xl p-1 cursor-pointer">
                 </div>
             </div>
             
-            <!-- Link URL Logo / Avatar -->
+            <!-- Link URL Logo / Avatar (Pre-compilato) -->
             <div>
-                <label class="block text-[10px] uppercase font-bold tracking-widest text-zinc-300 mb-1.5">Link URL Logo / Avatar</label>
+                <label class="block text-xs uppercase font-bold tracking-widest text-zinc-300 mb-1.5">Link URL Logo / Avatar</label>
                 <input type="url" id="logo_url" name="logo_url" 
-                    class="w-full bg-black border border-zinc-850 text-white rounded-xl px-4 py-3 text-sm outline-none focus:border-cyan-500 transition-colors" 
+                    class="w-full bg-black border border-zinc-800 text-white rounded-xl px-4 py-3.5 text-base outline-none focus:border-cyan-500 transition-colors" 
                     placeholder="https://esempio.com/logo.png">
+                <span class="text-[11px] text-zinc-500 mt-1 block">Rilevato in automatico dal tuo sito web. Puoi sostituirlo se lo desideri.</span>
+            </div>
+
+            <!-- NUOVO: Selezione Dropdown per l'obiettivo principale (UX Semplificata) -->
+            <div>
+                <label class="block text-xs uppercase font-bold tracking-widest text-zinc-300 mb-1.5">Obiettivo Principale dell'Assistente</label>
+                <select id="bot-goal" required
+                    class="w-full bg-black border border-zinc-800 text-white rounded-xl px-4 py-3.5 text-base outline-none focus:border-cyan-500 transition-colors cursor-pointer">
+                    <option value="vendite" selected>🎯 Generazione Lead & Vendite (Acquisisce contatti e consiglia)</option>
+                    <option value="supporto">💬 Supporto Clienti & FAQ (Risolve dubbi e fornisce informazioni)</option>
+                    <option value="prenotazione">📅 Prenotazione Appuntamenti (Incoraggia la prenotazione di incontri)</option>
+                    <option value="personalizzato">🧠 Libero / Personalizzato (Segui solo le mie istruzioni sotto)</option>
+                </select>
             </div>
 
             <!-- Regole e Comportamento (Sales Playbook) -->
             <div>
-                <label class="block text-[10px] uppercase font-bold tracking-widest text-zinc-300 mb-1.5">Istruzioni di Vendita e Comportamento (Sales Playbook)</label>
-                <textarea id="bot-rules" required rows="5" 
-                    placeholder="Esempi di istruzioni per guidare l'AI:&#10;- Obiettivo: Prova sempre a farti lasciare il numero di telefono per una chiamata rapida.&#10;- Sconti: Se un cliente tentenna sui prezzi, offrigli il codice promozionale NEXUS10.&#10;- Tono: Sii amichevole, conciso e usa le emoji. Evita risposte troppo formali.&#10;- Limiti: Non fare preventivi per progetti su misura, chiedi di scrivere a info@azienda.com."
-                    class="w-full bg-black border border-zinc-850 text-white rounded-xl px-4 py-3 text-sm outline-none focus:border-cyan-500 transition-colors resize-none text-xs leading-relaxed"></textarea>
+                <label class="block text-xs uppercase font-bold tracking-widest text-zinc-300 mb-1.5">Istruzioni Speciali e Dettagli Aggiuntivi</label>
+                <textarea id="bot-rules" rows="5" 
+                    placeholder="Fornisci istruzioni specifiche per il tuo business, per esempio:&#10;- Se un utente tentenna sul prezzo, proponigli il codice promozionale NEXUS10.&#10;- I nostri orari di apertura nel fine settimana sono solo la mattina (09:00 - 13:00).&#10;- Non fare preventivi per progetti su misura, invita l'utente a scrivere a info@sito.com."
+                    class="w-full bg-black border border-zinc-800 text-white rounded-xl px-4 py-3.5 text-sm outline-none focus:border-cyan-500 transition-colors resize-none leading-relaxed"></textarea>
             </div>
 
             <button type="submit" id="submit-btn"
-                class="w-full bg-white text-black font-black py-4 rounded-xl text-xs uppercase tracking-widest hover:bg-neutral-200 transition active:scale-95">
+                class="w-full bg-white text-black font-black py-4.5 rounded-xl text-sm uppercase tracking-widest hover:bg-neutral-200 transition active:scale-95 duration-200">
                 Salva Modifiche →
             </button>
         </form>
 
         <!-- Schermata di Successo -->
-        <div id="success-screen" class="hidden text-center py-8 space-y-4">
+        <div id="success-screen" class="hidden text-center py-8 space-y-4 animate-fade-in">
             <span class="text-4xl">✨</span>
-            <h3 class="text-lg font-bold text-white">Configurazione Salvata!</h3>
-            <p class="text-xs text-zinc-400">Le modifiche sono state registrate. Il chatbot sul tuo sito web si è già aggiornato in tempo reale con le nuove impostazioni.</p>
-            <button onclick="window.close()" class="text-[10px] border border-white/20 text-white px-4 py-2 rounded-full hover:bg-white/10 transition">Chiudi Finestra</button>
+            <h3 class="text-xl font-bold text-white">Configurazione Salvata!</h3>
+            <p class="text-sm text-zinc-400 leading-relaxed">Le modifiche sono state registrate con successo. L'assistente virtuale sul tuo sito si è già aggiornato in tempo reale con le nuove impostazioni.</p>
+            <button onclick="window.close()" class="text-xs border border-white/20 text-white px-6 py-2.5 rounded-full hover:bg-white/10 transition mt-4">Chiudi Finestra</button>
         </div>
     </div>
 
     <script>
-        // Legge automaticamente il bot_id dall'URL (es: config.html?bot_id=hotel_123)
+        // Legge l'ID del bot dall'URL (es: config.html?bot_id=bot_123)
         const urlParams = new URLSearchParams(window.location.search);
         const botId = urlParams.get('bot_id');
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             if (botId) {
                 document.getElementById('bot-id').value = botId;
+                await loadCurrentConfig(botId);
             } else {
                 alert("Errore: ID del bot mancante nell'indirizzo URL. Impossibile configurare.");
                 document.getElementById('submit-btn').disabled = true;
             }
         });
+
+        // Recupera i dati esistenti da Supabase per auto-compilare i campi
+        async function loadCurrentConfig(id) {
+            try {
+                const res = await fetch(`https://n8n.rmstudio.app/webhook/nexus-config-get?bot_id=${id}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data) {
+                        if (data.nome_bot) document.getElementById('bot-name').value = data.nome_bot;
+                        
+                        if (data.colore_hex) {
+                            const cleanColor = data.colore_hex.replace('#', '').trim();
+                            document.getElementById('colore_hex').value = cleanColor;
+                            document.getElementById('color-picker').value = '#' + cleanColor;
+                        }
+                        
+                        if (data.logo_url) document.getElementById('logo_url').value = data.logo_url;
+                        if (data.regole) document.getElementById('bot-rules').value = data.regole;
+                        if (data.obiettivo) document.getElementById('bot-goal').value = data.obiettivo;
+                    }
+                }
+            } catch (err) {
+                console.warn("Impossibile caricare la configurazione pregressa. Verranno usati i fallback di default.");
+            }
+        }
 
         // Sincronizza l'input di testo Hex con il Color Picker
         function updateColorPicker(val) {
@@ -117,7 +156,7 @@
             document.getElementById('colore_hex').value = val.replace('#', '');
         }
 
-        // Invia i dati direttamente a n8n
+        // Invia i dati a n8n per l'aggiornamento
         async function saveConfiguration(e) {
             e.preventDefault();
             
@@ -130,7 +169,8 @@
                 nome_bot: document.getElementById('bot-name').value.trim(),
                 colore_hex: document.getElementById('colore_hex').value.trim(),
                 regole_custom: document.getElementById('bot-rules').value.trim(),
-                logo_url: document.getElementById('logo_url').value.trim()
+                logo_url: document.getElementById('logo_url').value.trim(),
+                obiettivo: document.getElementById('bot-goal').value
             };
 
             try {
@@ -144,7 +184,7 @@
                     document.getElementById('config-form').classList.add('hidden');
                     document.getElementById('success-screen').classList.remove('hidden');
                 } else {
-                    alert("Errore durante il salvataggio dei dati su n8n. Riprova.");
+                    alert("Errore durante il salvataggio dei dati. Riprova.");
                 }
             } catch (err) {
                 alert("Errore di rete. Controlla la connessione.");
