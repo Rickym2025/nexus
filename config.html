@@ -12,67 +12,75 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
         .glass-panel {
-            backdrop-filter: blur(16px);
-            background: rgba(10, 10, 15, 0.75);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(24px);
+            background: rgba(12, 12, 18, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.12);
         }
     </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col justify-center items-center p-6 relative">
 
-    <!-- Sfondo Sfumato Estetico -->
-    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/10 blur-[120px] rounded-full pointer-events-none"></div>
-    <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 blur-[120px] rounded-full pointer-events-none"></div>
+    <!-- Sfondo Sfumato Estetico (Più Vivido) -->
+    <div class="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-cyan-500/15 blur-[130px] rounded-full pointer-events-none"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-purple-500/15 blur-[130px] rounded-full pointer-events-none"></div>
 
-    <!-- Modulo allargato per una migliore leggibilità dei testi -->
-    <div class="max-w-lg w-full p-10 glass-panel rounded-[2.5rem] relative z-10 border border-white/10 shadow-2xl">
+    <!-- Modulo più largo (max-w-xl) e ad alto contrasto -->
+    <div class="max-w-xl w-full p-10 glass-panel rounded-[2.5rem] relative z-10 shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
         <div class="text-center mb-8">
-            <img src="logo_nexus_bg.png" alt="NexusAI Logo" class="w-14 h-14 mx-auto mb-4 animate-pulse rounded-lg">
+            <img src="logo_nexus_bg.png" alt="NexusAI Logo" class="w-16 h-14 mx-auto mb-4 animate-pulse rounded-lg">
             <h1 class="text-3xl font-black text-white uppercase tracking-wider">Configura il tuo Bot</h1>
-            <p class="text-sm text-zinc-400 mt-2 leading-relaxed">Verifica le informazioni già estratte dal tuo sito e personalizza il comportamento dell'assistente in tempo reale.</p>
+            <p class="text-base text-zinc-300 mt-2 leading-relaxed">Verifica le informazioni già estratte dal tuo sito e personalizza il comportamento dell'assistente in tempo reale.</p>
         </div>
 
         <form id="config-form" onsubmit="saveConfiguration(event)" class="space-y-6">
-            <!-- ID del Bot (Disabilitato, viene preso in automatico dall'URL) -->
+            <!-- ID del Bot -->
             <div>
-                <label class="block text-xs uppercase font-bold tracking-widest text-zinc-400 mb-1.5">ID Identificativo Bot</label>
+                <label class="block text-xs uppercase font-extrabold tracking-widest text-zinc-400 mb-2">ID Identificativo Bot</label>
                 <input type="text" id="bot-id" readonly required
-                    class="w-full bg-zinc-950/50 border border-zinc-800 text-zinc-500 rounded-xl px-4 py-3 text-base outline-none cursor-not-allowed font-mono">
+                    class="w-full bg-zinc-950/70 border border-zinc-800 text-zinc-500 rounded-xl px-4 py-3 text-base outline-none cursor-not-allowed font-mono">
             </div>
 
             <!-- Nome del Bot -->
             <div>
-                <label class="block text-xs uppercase font-bold tracking-widest text-zinc-300 mb-1.5">Nome dell'Assistente (es. Elena)</label>
+                <label class="block text-xs uppercase font-extrabold tracking-widest text-white mb-2">Nome dell'Assistente (es. Elena)</label>
                 <input type="text" id="bot-name" required placeholder="Inserisci il nome del bot..."
-                    class="w-full bg-black border border-zinc-800 text-white rounded-xl px-4 py-3.5 text-base outline-none focus:border-cyan-500 transition-colors">
+                    class="w-full bg-black/80 border border-zinc-700/80 text-white rounded-xl px-4 py-3.5 text-base outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 transition-all placeholder-zinc-600 font-medium">
             </div>
 
-            <!-- Colore Hex del Brand (Con Color Picker Sincronizzato) -->
+            <!-- Colore Hex del Brand -->
             <div>
-                <label class="block text-xs uppercase font-bold tracking-widest text-zinc-300 mb-1.5">Colore del Brand (Estratto automaticamente)</label>
-                <div class="flex gap-2">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="block text-xs uppercase font-extrabold tracking-widest text-white">Colore del Brand</label>
+                    <!-- Badge Rilevamento automatico -->
+                    <span id="color-badge" class="hidden text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider animate-pulse">✓ Rilevato in automatico</span>
+                </div>
+                <div class="flex gap-3">
                     <input type="text" id="colore_hex" name="colore_hex" maxlength="6" oninput="updateColorPicker(this.value)"
-                        class="flex-1 bg-black border border-zinc-800 text-white rounded-xl px-4 py-3.5 text-base outline-none focus:border-cyan-500 transition-colors" 
+                        class="flex-1 bg-black/80 border border-zinc-700/80 text-white rounded-xl px-4 py-3.5 text-base outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 transition-all placeholder-zinc-600 font-mono" 
                         placeholder="Codice Hex es. 06b6d4">
                     <input type="color" id="color-picker" oninput="updateColorHex(this.value)"
-                        class="w-16 h-[50px] bg-black border border-zinc-800 rounded-xl p-1 cursor-pointer">
+                        class="w-16 h-[54px] bg-black border border-zinc-700/80 rounded-xl p-1.5 cursor-pointer">
                 </div>
             </div>
             
-            <!-- Link URL Logo / Avatar (Pre-compilato) -->
+            <!-- Link URL Logo / Avatar -->
             <div>
-                <label class="block text-xs uppercase font-bold tracking-widest text-zinc-300 mb-1.5">Link URL Logo / Avatar</label>
+                <div class="flex justify-between items-center mb-2">
+                    <label class="block text-xs uppercase font-extrabold tracking-widest text-white">Link URL Logo / Avatar</label>
+                    <!-- Badge Rilevamento automatico -->
+                    <span id="logo-badge" class="hidden text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider animate-pulse">✓ Rilevato in automatico</span>
+                </div>
                 <input type="url" id="logo_url" name="logo_url" 
-                    class="w-full bg-black border border-zinc-800 text-white rounded-xl px-4 py-3.5 text-base outline-none focus:border-cyan-500 transition-colors" 
+                    class="w-full bg-black/80 border border-zinc-700/80 text-white rounded-xl px-4 py-3.5 text-base outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 transition-all placeholder-zinc-600" 
                     placeholder="https://esempio.com/logo.png">
-                <span class="text-[11px] text-zinc-500 mt-1 block">Rilevato in automatico dal tuo sito web. Puoi sostituirlo se lo desideri.</span>
+                <span class="text-xs text-zinc-400 mt-2 block">Se i campi sopra sono già compilati, l'AI ha configurato tutto leggendo il tuo sito. Non devi fare nulla, solo confermare.</span>
             </div>
 
-            <!-- NUOVO: Selezione Dropdown per l'obiettivo principale (UX Semplificata) -->
+            <!-- Selezione Dropdown per l'obiettivo principale -->
             <div>
-                <label class="block text-xs uppercase font-bold tracking-widest text-zinc-300 mb-1.5">Obiettivo Principale dell'Assistente</label>
+                <label class="block text-xs uppercase font-extrabold tracking-widest text-white mb-2">Obiettivo Principale dell'Assistente</label>
                 <select id="bot-goal" required
-                    class="w-full bg-black border border-zinc-800 text-white rounded-xl px-4 py-3.5 text-base outline-none focus:border-cyan-500 transition-colors cursor-pointer">
+                    class="w-full bg-black border border-zinc-700/80 text-white rounded-xl px-4 py-3.5 text-base outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 transition-all cursor-pointer font-medium">
                     <option value="vendite" selected>🎯 Generazione Lead & Vendite (Acquisisce contatti e consiglia)</option>
                     <option value="supporto">💬 Supporto Clienti & FAQ (Risolve dubbi e fornisce informazioni)</option>
                     <option value="prenotazione">📅 Prenotazione Appuntamenti (Incoraggia la prenotazione di incontri)</option>
@@ -82,23 +90,24 @@
 
             <!-- Regole e Comportamento (Sales Playbook) -->
             <div>
-                <label class="block text-xs uppercase font-bold tracking-widest text-zinc-300 mb-1.5">Istruzioni Speciali e Dettagli Aggiuntivi</label>
+                <label class="block text-xs uppercase font-extrabold tracking-widest text-white mb-2">Istruzioni Speciali e Dettagli Aggiuntivi</label>
                 <textarea id="bot-rules" rows="5" 
-                    placeholder="Fornisci istruzioni specifiche per il tuo business, per esempio:&#10;- Se un utente tentenna sul prezzo, proponigli il codice promozionale NEXUS10.&#10;- I nostri orari di apertura nel fine settimana sono solo la mattina (09:00 - 13:00).&#10;- Non fare preventivi per progetti su misura, invita l'utente a scrivere a info@sito.com."
-                    class="w-full bg-black border border-zinc-800 text-white rounded-xl px-4 py-3.5 text-sm outline-none focus:border-cyan-500 transition-colors resize-none leading-relaxed"></textarea>
+                    placeholder="Fornisci istruzioni specifiche per il tuo business, per esempio:&#10;- Se un utente tentenna sul prezzo, proponigli il codice promozionale NEXUS10.&#10;- I nostri orari di apertura nel fine settimana sono solo la mattina (09:00 - 13:00).&#10;- Non fare preventivi per progetti su misura, chiedi di scrivere a info@sito.com."
+                    class="w-full bg-black/80 border border-zinc-700/80 text-white rounded-xl px-4 py-3.5 text-sm outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 transition-all resize-none leading-relaxed placeholder-zinc-600"></textarea>
             </div>
 
+            <!-- Pulsante di Invio Vivido con gradiente neon -->
             <button type="submit" id="submit-btn"
-                class="w-full bg-white text-black font-black py-4.5 rounded-xl text-sm uppercase tracking-widest hover:bg-neutral-200 transition active:scale-95 duration-200">
+                class="w-full bg-gradient-to-r from-brandCyan via-cyan-500 to-brandPurple text-white font-black py-4.5 rounded-xl text-sm uppercase tracking-widest hover:shadow-[0_0_25px_rgba(6,182,212,0.4)] transition-all duration-300 active:scale-95">
                 Salva Modifiche →
             </button>
         </form>
 
         <!-- Schermata di Successo -->
-        <div id="success-screen" class="hidden text-center py-8 space-y-4 animate-fade-in">
+        <div id="success-screen" class="hidden text-center py-8 space-y-4">
             <span class="text-4xl">✨</span>
             <h3 class="text-xl font-bold text-white">Configurazione Salvata!</h3>
-            <p class="text-sm text-zinc-400 leading-relaxed">Le modifiche sono state registrate con successo. L'assistente virtuale sul tuo sito si è già aggiornato in tempo reale con le nuove impostazioni.</p>
+            <p class="text-sm text-zinc-300 leading-relaxed">Le modifiche sono state registrate con successo. L'assistente virtuale sul tuo sito si è già aggiornato in tempo reale con le nuove impostazioni.</p>
             <button onclick="window.close()" class="text-xs border border-white/20 text-white px-6 py-2.5 rounded-full hover:bg-white/10 transition mt-4">Chiudi Finestra</button>
         </div>
     </div>
@@ -131,15 +140,22 @@
                             const cleanColor = data.colore_hex.replace('#', '').trim();
                             document.getElementById('colore_hex').value = cleanColor;
                             document.getElementById('color-picker').value = '#' + cleanColor;
+                            // Mostra il badge di avvenuto rilevamento
+                            document.getElementById('color-badge').classList.remove('hidden');
                         }
                         
-                        if (data.logo_url) document.getElementById('logo_url').value = data.logo_url;
+                        if (data.logo_url) {
+                            document.getElementById('logo_url').value = data.logo_url;
+                            // Mostra il badge di avvenuto rilevamento
+                            document.getElementById('logo-badge').classList.remove('hidden');
+                        }
+                        
                         if (data.regole) document.getElementById('bot-rules').value = data.regole;
                         if (data.obiettivo) document.getElementById('bot-goal').value = data.obiettivo;
                     }
                 }
             } catch (err) {
-                console.warn("Impossibile caricare la configurazione pregressa. Verranno usati i fallback di default.");
+                console.warn("Impossibile caricare la configurazione pregressa. Verranno usati i fallback.");
             }
         }
 
