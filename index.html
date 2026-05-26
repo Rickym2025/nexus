@@ -1,991 +1,156 @@
 <!DOCTYPE html>
-<html lang="it" class="scroll-smooth">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusAI | AI Sales Overlay per il tuo Business</title>
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;0,900;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <title>Generatore Anteprima Chatbot | Live Demo</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        darkBg: '#030307',
-                        brandCyan: '#06b6d4',
-                        brandPurple: '#8b5cf6',
-                        brandPink: '#ec4899',
-                        panelBg: 'rgba(10, 10, 15, 0.92)'
-                    },
-                    fontFamily: {
-                        sans: ['"DM Sans"', 'sans-serif'],
-                        mono: ['"Space Mono"', 'monospace'],
-                    }
-                }
-            }
-        }
-    </script>
     <style>
-        *, *::before, *::after { box-sizing: border-box; }
-
         body {
-            background-color: #030307;
-            color: #f4f4f5;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 17px;
+            background-color: #030303;
+            color: #ededed;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
-
-        /* ── Glassmorphism leggero (Ottimizzato per performance video) ── */
-        .glass-panel {
-            backdrop-filter: blur(8px);
-            background: rgba(10, 10, 15, 0.92);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        /* ── Cornice Neon Cangiante ad alta fluidità ── */
-        @keyframes border-rainbow {
-            0%, 100% { border-color: #06b6d4; }
-            33%       { border-color: #8b5cf6; }
-            66%       { border-color: #ec4899; }
-        }
-        .animated-rainbow-border { 
-            border-width: 2px;
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.25);
-            animation: border-rainbow 8s infinite linear; 
-        }
-
-        /* ── Scanline overlay leggero ── */
-        body::after {
-            content: '';
-            pointer-events: none;
-            position: fixed;
-            inset: 0;
-            z-index: 999;
-            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.02) 2px, rgba(0,0,0,.02) 4px);
-        }
-
-        /* ── Grain texture ── */
-        .grain::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-            pointer-events: none;
-            opacity: .25;
-        }
-
-        /* ── Page-load fade-in ── */
-        @keyframes fadeUp { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:translateY(0); } }
-        .fade-up { opacity:0; animation: fadeUp .7s ease forwards; }
-        .delay-1 { animation-delay:.15s; }
-        .delay-2 { animation-delay:.30s; }
-        .delay-3 { animation-delay:.50s; }
-        .delay-4 { animation-delay:.70s; }
-
-        /* ── Stat ticker ── */
-        .ticker-wrap { overflow: hidden; }
-        @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-        .ticker-track { display: flex; gap: 0; animation: ticker 25s linear infinite; white-space: nowrap; }
-
-        /* ── Video GPU acceleration hack ── */
-        video {
-            transform: translate3d(0,0,0);
-            backface-visibility: hidden;
-            will-change: transform;
-            -webkit-perspective: 1000;
-            perspective: 1000;
-        }
-
-        /* ── Chatbot config ── */
-        :root {
-            --cyan:   #06b6d4;
-            --purple: #8b5cf6;
-            --surface: rgba(6, 6, 9, 0.98);
-            --border: rgba(255,255,255,0.08);
-            --green:  #22c55e;
-        }
-
-        #nx-bubble {
-            position: fixed; bottom: 30px; left: 30px;
-            width: 70px; height: 70px; border-radius: 50%;
-            background: #050508;
-            cursor: pointer; z-index: 9998;
-            display: flex; align-items: center; justify-content: center;
-            transition: transform .3s cubic-bezier(.34,1.56,.64,1);
-        }
-        #nx-bubble:hover { transform: scale(1.1); }
-
-        #nx-window {
-            position: fixed; bottom: 120px; left: 30px;
-            width: 380px; max-height: 600px;
-            background: var(--surface);
-            backdrop-filter: blur(24px);
-            border-radius: 28px;
-            box-shadow: 0 40px 80px rgba(0,0,0,.95);
-            z-index: 9998;
-            display: none; flex-direction: column;
-            overflow: hidden;
-            transition: opacity .25s, transform .25s cubic-bezier(.34,1.56,.64,1);
-            transform-origin: bottom left;
-        }
-        #nx-window.open { display: flex; animation: popIn .3s cubic-bezier(.34,1.56,.64,1) forwards; }
-        @keyframes popIn { from { opacity:0; transform: scale(.88); } to { opacity:1; transform: scale(1); } }
-
-        .nx-header {
-            background: rgba(10,10,16,0.98);
-            border-bottom: 1px solid var(--border);
-            padding: 18px 20px;
-            display: flex; justify-content: space-between; align-items: center;
-            flex-shrink: 0;
-        }
-
-        .nx-messages {
-            flex: 1; padding: 20px; overflow-y: auto;
-            background: #020205;
-            display: flex; flex-direction: column; gap: 12px;
-            scroll-behavior: smooth;
-        }
-        .nx-messages::-webkit-scrollbar { width: 3px; }
-        .nx-messages::-webkit-scrollbar-thumb { background: rgba(6,182,212,.3); border-radius:99px; }
-
-        .nx-msg {
-            padding: 12px 16px; border-radius: 18px;
-            font-size: 14px; max-width: 88%; line-height: 1.55;
-            text-align: left; animation: msgIn .3s ease forwards;
-        }
-        @keyframes msgIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
-
-        .nx-msg.bot  {
-            background: #0a0a14; color: #f4f4f5;
-            border: 1px solid var(--border);
-            align-self: flex-start; border-bottom-left-radius: 5px;
-        }
-        .nx-msg.user {
-            background: linear-gradient(135deg, var(--cyan), var(--purple));
-            color: #fff; font-weight: 600;
-            align-self: flex-end; border-bottom-right-radius: 5px;
-        }
-        .nx-msg b { color: var(--cyan); font-weight: 700; }
-
-        /* Quick replies */
-        .nx-quick-replies {
-            display: flex; flex-wrap: wrap; gap: 8px;
-            padding: 0 20px 14px;
-        }
-        .nx-qr {
-            background: rgba(6,182,212,.08); border: 1px solid rgba(6,182,212,.25);
-            color: var(--cyan); font-size: 12px; font-weight: 700;
-            padding: 8px 14px; border-radius: 99px; cursor: pointer;
-            transition: background .2s, transform .15s;
-            white-space: nowrap;
-        }
-        .nx-qr:hover { background: rgba(6,182,212,.18); transform: translateY(-1px); }
-
-        .nx-input-area {
-            padding: 14px; border-top: 1px solid var(--border);
-            display: flex; gap: 10px;
-            background: rgba(10,10,16,0.98);
-            flex-shrink: 0;
-        }
-        .nx-input-area input {
-            flex: 1; border: 1px solid var(--border); border-radius: 12px;
-            padding: 12px 16px; outline: none;
-            font-size: 14px; color: #fff;
-            background: #05050a; font-family: inherit;
-            transition: border-color .2s;
-        }
-        .nx-input-area input:focus { border-color: var(--cyan); }
-        .nx-input-area button {
-            background: linear-gradient(135deg, var(--cyan), var(--purple));
-            border: none; border-radius: 12px;
-            color: #fff; cursor: pointer;
-            font-weight: 800; font-size: 13px;
-            padding: 0 18px; letter-spacing: .05em;
-            transition: opacity .2s, transform .15s;
-        }
-        .nx-input-area button:hover { opacity: .9; transform: scale(1.03); }
-
-        @media (max-width: 450px) {
-            #nx-window { width: calc(100% - 36px); left: 18px; bottom: 100px; }
-            #nx-bubble { bottom: 22px; left: 18px; }
+        .gradient-border {
+            background: linear-gradient(rgba(18, 18, 18, 0.8), rgba(18, 18, 18, 0.8)) padding-box,
+                        linear-gradient(135deg, #06b6d4, #3b82f6) border-box;
+            border: 1px solid transparent;
         }
     </style>
 </head>
-<body class="antialiased min-h-screen flex flex-col overflow-x-hidden">
-
-    <!-- Background video fludio -->
-    <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <video autoplay loop muted playsinline preload="auto" class="w-full h-full object-cover opacity-20">
-            <source src="background.mp4" type="video/mp4">
-        </video>
-        <div class="absolute inset-0 bg-gradient-to-b from-darkBg/95 via-darkBg/60 to-darkBg"></div>
-    </div>
-
-    <!-- Navbar -->
-    <header class="fixed top-0 left-0 w-full p-4 md:p-5 z-50 backdrop-blur-md bg-black/25 border-b border-white/5">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <img src="logo_nexus_bg.png" alt="NexusAI Logo" class="w-8 h-8 object-contain animate-pulse">
-                <span class="font-black tracking-[0.2em] text-base uppercase font-mono text-white">NexusAI</span>
-            </div>
-            <nav class="hidden md:flex items-center gap-7 text-xs text-zinc-300 font-bold uppercase tracking-widest">
-                <a href="#come-funziona" class="hover:text-white transition-colors font-sans text-sm">Come Funziona</a>
-                <a href="#demo-azione"   class="hover:text-white transition-colors font-sans text-sm">In Azione</a>
-                <a href="#ecosistema"    class="hover:text-white transition-colors font-sans text-sm">Ecosistema</a>
-                <a href="#pricing"       class="hover:text-white transition-colors font-sans text-sm">Prezzi</a>
-            </nav>
-            <a href="#demo" class="text-[9px] font-black uppercase tracking-widest text-brandCyan hover:text-cyan-300 transition-colors border border-brandCyan/30 px-5 py-2.5 rounded-full bg-brandCyan/5 hover:bg-brandCyan/10">
-                Prova Gratis
-            </a>
-        </div>
-    </header>
-
-    <main class="relative z-10 flex flex-col w-full">
-
-        <!-- ═══ HERO ═══ -->
-        <section class="min-h-screen flex flex-col items-center justify-center px-6 pt-32 pb-20 text-center">
-            <div class="max-w-4xl mx-auto">
-
-                <!-- Live counter – social proof -->
-                <div class="flex items-center justify-center gap-2 mb-8 fade-up delay-1">
-                    <span class="w-2.5 h-2.5 rounded-full bg-green-400 shadow-[0_0_12px_#4ade80] animate-pulse"></span>
-                    <span class="font-mono text-sm text-zinc-200 uppercase tracking-widest">
-                        <span id="live-count" class="font-bold text-white">247</span> siti attivi in questo momento
-                    </span>
-                </div>
-
-                <h1 class="text-5xl md:text-[4.5rem] font-black tracking-tight leading-[1.05] mb-8 fade-up delay-2">
-                    Il 98% dei tuoi visitatori esce.<br>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-brandCyan via-blue-400 to-brandPurple">
-                        Inizia a vendere parlando.
-                    </span>
-                </h1>
-
-                <p class="text-lg md:text-2xl text-zinc-200 max-w-2xl mx-auto mb-14 font-light leading-relaxed fade-up delay-3">
-                    Le persone abbandonano i siti vetrina perché richiedono sforzo attivo di lettura.
-                    <strong class="text-white font-medium">NexusAI</strong> elimina l'attrito cognitivo e converte i visitatori passivi in lead reali.
-                </p>
-
-                <!-- Demo generator (Neon Highlight Box - High Legibility) -->
-                <div id="demo" class="w-full max-w-lg mx-auto p-8 bg-zinc-950 rounded-[2rem] text-left border-2 border-brandCyan/50 shadow-[0_0_50px_rgba(6,182,212,0.18)] relative fade-up delay-4">
-                    <div class="absolute -top-3.5 right-8 bg-brandCyan text-black text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-widest shadow-md">
-                        Test Istantaneo (Prima Pagina)
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-2">Guarda l'AI impossessarsi del tuo sito</h3>
-                    <p class="text-sm text-zinc-300 mb-6 leading-relaxed">Inserisci l'URL: lo analizziamo, estraiamo le informazioni chiave della tua <strong>home page</strong> e lo attiviamo.</p>
-
-                    <div class="space-y-5">
-                        <div>
-                            <label class="block text-xs uppercase font-black tracking-widest text-zinc-200 mb-2">Il tuo Sito Web</label>
-                            <input type="url" id="site-url" placeholder="https://tuosito.com"
-                                class="w-full bg-black border border-zinc-700 text-white rounded-xl px-4 py-3.5 text-base outline-none focus:border-brandCyan transition-colors">
-                        </div>
-                        <button onclick="generateDemo()" class="w-full bg-brandCyan text-black font-black py-4 rounded-xl text-xs hover:bg-cyan-400 transition uppercase tracking-widest active:scale-95">
-                            Genera Demo Live →
-                        </button>
-                    </div>
-
-                    <div id="demo-result" class="mt-6 pt-5 border-t border-zinc-800/80 hidden">
-                        <p class="text-xs text-zinc-200 mb-2 font-bold uppercase tracking-wider">La tua anteprima interattiva è pronta:</p>
-                        <div class="p-3 bg-zinc-900 border border-zinc-800 rounded-xl">
-                            <a id="demo-link" href="#" target="_blank"
-                                class="text-sm text-brandCyan underline break-all font-mono hover:text-cyan-300 transition-colors font-bold"></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══ TICKER ═══ -->
-        <div class="ticker-wrap border-y border-white/5 py-4 bg-black/50 relative z-10 overflow-hidden">
-            <div class="ticker-track text-xs font-mono text-zinc-300 uppercase tracking-widest">
-                <span class="px-10">⚡ +312% conversioni medie</span>
-                <span class="px-10">🤖 AI allineata al tuo brand</span>
-                <span class="px-10">🔌 1 riga di codice per attivarlo</span>
-                <span class="px-10">💬 Risposte in &lt;1 secondo</span>
-                <span class="px-10">📈 Lead qualificati H24</span>
-                <span class="px-10">🔒 Infrastruttura dedicata RM Studio</span>
-                <!-- duplicate for seamless loop -->
-                <span class="px-10">⚡ +312% conversioni medie</span>
-                <span class="px-10">🤖 AI allineata al tuo brand</span>
-                <span class="px-10">🔌 1 riga di codice per attivarlo</span>
-                <span class="px-10">💬 Risposte in &lt;1 secondo</span>
-                <span class="px-10">📈 Lead qualificati H24</span>
-                <span class="px-10">🔒 Infrastruttura dedicata RM Studio</span>
-            </div>
+<body class="antialiased min-h-screen flex flex-col justify-between p-6">
+    <div class="max-w-md w-full mx-auto my-auto p-8 bg-[#0a0a0a] border border-[#1a1a1a] rounded-2xl shadow-2xl relative overflow-hidden">
+        
+        <!-- Intestazione -->
+        <div class="mb-8 relative z-10">
+            <div class="h-9 w-9 bg-cyan-500 rounded-lg flex items-center justify-center text-black font-black text-lg mb-4 shadow-lg shadow-cyan-500/20">N</div>
+            <h1 class="text-2xl font-bold tracking-tight text-white mb-2">Prova l'assistente sul tuo sito</h1>
+            <p class="text-xs text-neutral-400 leading-relaxed">Inserisci il tuo sito web e scopri come l'intelligenza artificiale può interagire con i tuoi clienti, personalizzando stile e informazioni in pochi secondi.</p>
         </div>
 
-        <!-- ═══ COME FUNZIONA ═══ -->
-        <section id="come-funziona" class="py-32 px-6 border-t border-white/5">
-            <div class="max-w-5xl mx-auto text-center">
-                <p class="font-mono text-xs text-brandCyan uppercase tracking-[5px] mb-4">Processo</p>
-                <h2 class="text-3xl md:text-5xl font-black tracking-tight mb-16 uppercase">Eliminiamo ogni barriera</h2>
-
-                <div class="grid md:grid-cols-3 gap-6 text-left">
-                    <div class="p-8 glass-panel rounded-2xl relative overflow-hidden group hover:border-brandCyan/20 transition-all">
-                        <div class="absolute -right-6 -top-6 text-8xl font-black text-white/[0.03] select-none group-hover:text-white/[0.06] transition">01</div>
-                        <span class="text-3xl mb-4 block">🔍</span>
-                        <h3 class="text-lg font-bold text-white mb-2">Scraping & Comprensione</h3>
-                        <p class="text-sm text-zinc-300 leading-relaxed">Il motore scansiona e organizza automaticamente i contenuti del tuo sito, digerendone la voce e i prodotti.</p>
-                    </div>
-                    <div class="p-8 glass-panel rounded-2xl relative overflow-hidden group hover:border-brandCyan/20 transition-all">
-                        <div class="absolute -right-6 -top-6 text-8xl font-black text-white/[0.03] select-none group-hover:text-white/[0.06] transition">02</div>
-                        <span class="text-3xl mb-4 block">🧠</span>
-                        <h3 class="text-lg font-bold text-white mb-2">Allineamento Cognitivo</h3>
-                        <p class="text-sm text-zinc-300 leading-relaxed">Generiamo regole comportamentali strutturate perché l'AI parli esattamente con il tuo tono di voce.</p>
-                    </div>
-                    <div class="p-8 glass-panel rounded-2xl relative overflow-hidden group hover:border-brandCyan/20 transition-all">
-                        <div class="absolute -right-6 -top-6 text-8xl font-black text-white/[0.03] select-none group-hover:text-white/[0.06] transition">03</div>
-                        <span class="text-3xl mb-4 block">🔌</span>
-                        <h3 class="text-lg font-bold text-white mb-2">Tag Singolo</h3>
-                        <p class="text-sm text-zinc-300 leading-relaxed">Una riga di codice nel tuo HTML. Tutto il carico computazionale rimane sulla nostra infrastruttura europea.</p>
-                    </div>
-                </div>
+        <!-- Form di Input -->
+        <form id="generator-form" class="space-y-4 relative z-10">
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1.5">Sito Web dell'attività</label>
+                <input type="url" id="input-site" required 
+                    class="w-full bg-black border border-[#222] text-white rounded-lg px-4 py-3 text-sm outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/30 transition duration-200" 
+                    placeholder="https://esempio.com">
             </div>
-        </section>
-
-        <!-- ═══ SEZIONE NEURO-COMPARATIVA: STATICO VS ATTIVO ═══ -->
-        <section class="py-32 px-6 border-t border-white/5 bg-zinc-950/20 relative z-10">
-            <div class="max-w-5xl mx-auto">
-                <p class="font-mono text-xs text-brandPurple uppercase tracking-[5px] mb-4 text-center">La scienza della conversione</p>
-                <h2 class="text-3xl md:text-5xl font-black text-center tracking-tighter mb-16 uppercase">Il costo della Non Azione</h2>
-
-                <div class="grid md:grid-cols-2 gap-8">
-                    <!-- Pain Column -->
-                    <div class="p-8 bg-zinc-950 border border-red-500/10 rounded-3xl relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-red-500/5 blur-2xl rounded-full"></div>
-                        <span class="text-xs uppercase tracking-widest font-black text-red-500 mb-4 block">Senza NexusAI (Sito Tradizionale)</span>
-                        <h4 class="text-xl font-bold text-zinc-200 mb-6">Un imbuto di vendite interrotto</h4>
-                        <ul class="space-y-4 text-sm text-zinc-300">
-                            <li class="flex items-start gap-3">
-                                <span class="text-red-500 mt-1">✕</span>
-                                <span><strong>Friction Elevata:</strong> L'utente deve cercare attivamente le risposte navigando tra le pagine.</span>
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <span class="text-red-500 mt-1">✕</span>
-                                <span><strong>Abbandono in 15 secondi:</strong> Se il visitatore non trova subito ciò che cerca, esce.</span>
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <span class="text-red-500 mt-1">✕</span>
-                                <span><strong>Moduli di contatto morti:</strong> I moduli statici registrano un tasso di conversione inferiore al 2%.</span>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <!-- Pleasure Column -->
-                    <div class="p-8 bg-zinc-950 border-2 border-brandCyan/25 rounded-3xl relative overflow-hidden shadow-[0_0_40px_rgba(6,182,212,0.06)]">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-brandCyan/10 blur-2xl rounded-full"></div>
-                        <span class="text-xs uppercase tracking-widest font-black text-brandCyan mb-4 block">Con NexusAI (Conversione Attiva)</span>
-                        <h4 class="text-xl font-bold text-white mb-6">L'azzeramento dell'attrito cognitivo</h4>
-                        <ul class="space-y-4 text-sm text-zinc-100">
-                            <li class="flex items-start gap-3">
-                                <span class="text-brandCyan mt-1">✓</span>
-                                <span><strong>Ingaggio Istantaneo:</strong> L'AI inizia la conversazione sollevando l'utente dallo sforzo di lettura.</span>
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <span class="text-brandCyan mt-1">✓</span>
-                                <span><strong>Presidio commerciale H24:</strong> Risposte in millisecondi a dubbi su prezzi, servizi e logistica.</span>
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <span class="text-brandCyan mt-1">✓</span>
-                                <span><strong>+312% contatti qualificati:</strong> Interazione naturale che spinge l'utente all'azione senza pressioni.</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══ SEZIONE INTERATTIVA: SIMULATORE DI CHAT (SOSTITUTO VIDEO) ═══ -->
-        <section id="demo-azione" class="py-32 px-6 border-t border-white/5 relative z-10">
-            <div class="max-w-5xl mx-auto">
-                <p class="font-mono text-xs text-brandCyan uppercase tracking-[5px] mb-4 text-center">In Azione</p>
-                <h2 class="text-3xl md:text-5xl font-black text-center tracking-tighter mb-4 uppercase">Simula una conversazione</h2>
-                <p class="text-base text-zinc-300 text-center mb-16 max-w-md mx-auto">Fai clic su una delle domande per vedere come l'AI gestisce un visitatore reale sul tuo sito.</p>
-
-                <!-- Static Console Chat Simulator -->
-                <div class="max-w-2xl mx-auto bg-[#0a0a0f] border-2 border-brandCyan/30 rounded-[2rem] overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)]">
-                    <div class="bg-zinc-950 px-6 py-4 border-b border-white/5 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <img src="logo_nexus_bg.png" class="w-7 h-7 object-contain" alt="">
-                            <span class="font-mono text-xs uppercase tracking-wider text-zinc-300">NexusAI Console Simulator</span>
-                        </div>
-                        <span class="text-[10px] bg-brandCyan/10 text-brandCyan border border-brandCyan/30 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">Interattivo</span>
-                    </div>
-
-                    <div id="sim-messages" class="p-6 h-[280px] overflow-y-auto flex flex-col gap-4 bg-[#030306]">
-                        <div class="nx-msg bot">
-                            Ciao! Sono l'assistente demo di NexusAI. Fai clic su uno dei pulsanti in basso per simulare una richiesta reale del cliente. 👇
-                        </div>
-                    </div>
-
-                    <div class="p-4 bg-zinc-950 border-t border-white/5 flex flex-wrap gap-2 justify-center">
-                        <button onclick="triggerSim('prezzi')" class="bg-brandCyan/10 border border-brandCyan/30 text-brandCyan text-xs font-bold px-4 py-2.5 rounded-full hover:bg-brandCyan hover:text-black transition">Come gestisci i prezzi?</button>
-                        <button onclick="triggerSim('attivazione')" class="bg-brandPurple/10 border border-brandPurple/30 text-brandPurple text-xs font-bold px-4 py-2.5 rounded-full hover:bg-brandPurple hover:text-white transition">È difficile da attivare?</button>
-                        <button onclick="triggerSim('sicurezza')" class="bg-brandPink/10 border border-brandPink/30 text-brandPink text-xs font-bold px-4 py-2.5 rounded-full hover:bg-brandPink hover:text-white transition">I dati sono al sicuro?</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══ ECOSISTEMA ═══ -->
-        <section id="ecosistema" class="py-32 px-6 border-t border-white/5">
-            <div class="max-w-5xl mx-auto">
-                <p class="font-mono text-xs text-brandCyan uppercase tracking-[5px] mb-4 text-center">Prodotti</p>
-                <h2 class="text-3xl md:text-5xl font-black text-center tracking-tighter mb-20 uppercase">I Nostri Ecosistemi</h2>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <a href="https://concierge24.rmstudio.app" target="_blank"
-                        class="group p-8 glass-panel rounded-3xl flex flex-col justify-between hover:border-brandCyan/20 transition-all hover:-translate-y-1">
-                        <div>
-                            <span class="text-[10px] uppercase tracking-[3px] font-black text-orange-400">Hospitality</span>
-                            <h3 class="text-xl font-bold mt-2 mb-3 text-white">Concierge24</h3>
-                            <p class="text-sm text-zinc-300 leading-relaxed mb-6">Assistente vocale e testuale AI H24 ("Giulia") per hotel e strutture extra-ricettive.</p>
-                        </div>
-                        <span class="text-xs font-black uppercase text-brandCyan group-hover:underline">Visita →</span>
-                    </a>
-
-                    <a href="https://drivemotion.rmstudio.app" target="_blank"
-                        class="group p-8 glass-panel rounded-3xl flex flex-col justify-between hover:border-brandCyan/20 transition-all hover:-translate-y-1">
-                        <div>
-                            <span class="text-[10px] uppercase tracking-[3px] font-black text-blue-400">Automotive AI</span>
-                            <h3 class="text-xl font-bold mt-2 mb-3 text-white">DriveMotion AI</h3>
-                            <p class="text-sm text-zinc-300 leading-relaxed mb-6">Trasforma le foto del piazzale del concessionario in video cinematici pronti per i social.</p>
-                        </div>
-                        <span class="text-xs font-black uppercase text-brandCyan group-hover:underline">Visita →</span>
-                    </a>
-
-                    <a href="https://hometour.rmstudio.app" target="_blank"
-                        class="group p-8 glass-panel rounded-3xl flex flex-col justify-between hover:border-brandCyan/20 transition-all hover:-translate-y-1">
-                        <div>
-                            <span class="text-[10px] uppercase tracking-[3px] font-black text-green-400">Real Estate</span>
-                            <h3 class="text-xl font-bold mt-2 mb-3 text-white">HomeTour AI</h3>
-                            <p class="text-sm text-zinc-300 leading-relaxed mb-6">Reel immobiliari completi di voce narrante generati in automatico a partire da semplici foto.</p>
-                        </div>
-                        <span class="text-xs font-black uppercase text-brandCyan group-hover:underline">Visita →</span>
-                    </a>
-
-                    <a href="https://omniastudio.rmstudio.app" target="_blank"
-                        class="group p-8 glass-panel rounded-3xl flex flex-col justify-between hover:border-brandCyan/20 transition-all hover:-translate-y-1">
-                        <div>
-                            <span class="text-[10px] uppercase tracking-[3px] font-black text-purple-400">Privacy AI</span>
-                            <h3 class="text-xl font-bold mt-2 mb-3 text-white">OmniaStudio</h3>
-                            <p class="text-sm text-zinc-300 leading-relaxed mb-6">La potenza dell'AI generativa locale e offline per la massima riservatezza dello studio.</p>
-                        </div>
-                        <span class="text-xs font-black uppercase text-brandCyan group-hover:underline">Visita →</span>
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══ TESTIMONIALS ═══ -->
-        <section class="py-32 px-6 border-t border-white/5">
-            <div class="max-w-4xl mx-auto">
-                <p class="font-mono text-xs text-brandCyan uppercase tracking-[5px] mb-4 text-center">Prove sociali</p>
-                <h2 class="text-3xl md:text-4xl font-black text-center tracking-tighter mb-16 uppercase">Dicono di noi</h2>
-                <div class="grid md:grid-cols-3 gap-6">
-                    <div class="p-8 glass-panel rounded-2xl hover:border-white/10 transition-all">
-                        <div class="flex gap-1 mb-4 text-brandCyan text-xs">★★★★★</div>
-                        <p class="text-sm text-zinc-300 italic mb-6 leading-relaxed">"Abbiamo venduto un immobile in 4 giorni dall'annuncio. Il Reel di HomeTour ha fatto 10k views organiche su Instagram."</p>
-                        <div>
-                            <div class="text-[10px] uppercase font-black tracking-widest text-brandCyan">Marco G.</div>
-                            <div class="text-[10px] text-zinc-500 uppercase tracking-wider font-bold">Agente — Modena</div>
-                        </div>
-                    </div>
-                    <div class="p-8 glass-panel rounded-2xl hover:border-white/10 transition-all">
-                        <div class="flex gap-1 mb-4 text-brandCyan text-xs">★★★★★</div>
-                        <p class="text-sm text-zinc-300 italic mb-6 leading-relaxed">"L'assistente Concierge24 ha azzerato le chiamate in reception per la password del WiFi. Il team ringrazia."</p>
-                        <div>
-                            <div class="text-[10px] uppercase font-black tracking-widest text-brandCyan">Sara L.</div>
-                            <div class="text-[10px] text-zinc-500 uppercase tracking-wider font-bold">Direttrice — Roma</div>
-                        </div>
-                    </div>
-                    <div class="p-8 glass-panel rounded-2xl hover:border-white/10 transition-all">
-                        <div class="flex gap-1 mb-4 text-brandCyan text-xs">★★★★★</div>
-                        <p class="text-sm text-zinc-300 italic mb-6 leading-relaxed">"Marketing di un altro livello. Le auto sembrano fotografate in studio. DriveMotion ha cambiato le nostre vendite."</p>
-                        <div>
-                            <div class="text-[10px] uppercase font-black tracking-widest text-brandCyan">Studio Rossi</div>
-                            <div class="text-[10px] text-zinc-500 uppercase tracking-wider font-bold">Concessionario</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══ PRICING ═══ -->
-        <section id="pricing" class="py-32 px-6 border-t border-white/5">
-            <div class="max-w-4xl mx-auto text-center">
-                <p class="font-mono text-xs text-brandCyan uppercase tracking-[5px] mb-4">Investimento</p>
-                <h2 class="text-3xl md:text-4xl font-black mb-4 uppercase">Meno di un caffè al giorno</h2>
-                <p class="text-xs text-zinc-500 mb-16 uppercase tracking-widest font-bold">Per automatizzare la tua reception commerciale H24</p>
-
-                <div class="grid md:grid-cols-2 gap-7 max-w-2xl mx-auto text-left">
-                    <!-- Standard -->
-                    <div class="p-8 bg-zinc-950 rounded-3xl relative border-2 border-brandCyan/40 shadow-[0_0_50px_rgba(6,182,212,0.12)]">
-                        <span class="absolute -top-3.5 right-6 bg-brandCyan text-black text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Più Popolare</span>
-                        <h3 class="text-lg font-bold text-white mb-1">Standard Plan</h3>
-                        <p class="text-xs text-zinc-400 mb-6 leading-relaxed">Per hotel, agenzie e siti aziendali.</p>
-                        <div class="mb-7 flex items-end gap-2">
-                            <span class="text-4xl font-black text-white">€49</span>
-                            <span class="text-zinc-500 text-xs pb-1">/ mese</span>
-                        </div>
-                        <ul class="text-xs text-zinc-300 space-y-3 mb-8">
-                            <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> 1 Chatbot attivo sul tuo sito</li>
-                            <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> <strong>Scansione fino a 10 pagine</strong> del tuo sito</li>
-                            <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> Messaggi e lead illimitati</li>
-                            <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> Allineamento estetico e colore Hex</li>
-                        </ul>
-                        <button onclick="alert('Integrazione Stripe attiva')"
-                            class="w-full bg-white text-black font-black py-3 rounded-xl text-xs uppercase tracking-widest hover:bg-neutral-100 transition active:scale-95">
-                            Attiva Ora
-                        </button>
-                    </div>
-
-                    <!-- Custom -->
-                    <div class="p-8 glass-panel rounded-3xl opacity-80 hover:opacity-100 transition-opacity">
-                        <h3 class="text-base font-bold text-white mb-1">Custom Hub</h3>
-                        <p class="text-xs text-zinc-500 mb-6 leading-relaxed">Ecosistemi complessi per portali corposi.</p>
-                        <div class="mb-7 flex items-end gap-2">
-                            <span class="text-4xl font-black text-white">€199</span>
-                            <span class="text-zinc-600 text-xs pb-1">/ mese</span>
-                        </div>
-                        <ul class="text-xs text-zinc-400 space-y-3 mb-8">
-                            <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> Fino a 5 chatbot contemporanei</li>
-                            <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> <strong>Scansione profonda (+10 pagine o PDF)</strong></li>
-                            <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> Supporto tecnico dedicato su WhatsApp</li>
-                            <li class="flex items-center gap-2"><span class="text-brandCyan">✓</span> Webhook verso il tuo CRM</li>
-                        </ul>
-                        <a href="#contatti"
-                            class="w-full bg-zinc-800 text-white font-black py-3 rounded-xl text-xs uppercase tracking-widest hover:bg-zinc-700 transition text-center block active:scale-95">
-                            Parla Con Noi
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══ CONTATTI ═══ -->
-        <section id="contatti" class="py-24 px-6 border-t border-white/5">
-            <div class="max-w-4xl mx-auto glass-panel grain p-8 md:p-12 rounded-[2.5rem] relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-72 h-72 bg-brandCyan/8 blur-3xl rounded-full pointer-events-none"></div>
-                <div class="absolute bottom-0 left-0 w-56 h-56 bg-brandPurple/8 blur-3xl rounded-full pointer-events-none"></div>
-                <h2 class="text-2xl font-bold mb-2 flex items-center gap-3 relative z-10">
-                    <span class="w-2.5 h-2.5 rounded-full bg-green-400 shadow-[0_0_10px_#4ade80]"></span>
-                    Contatta il Lab
-                </h2>
-                <p class="text-zinc-300 text-sm mb-8 relative z-10 max-w-md">Vuoi un preventivo personalizzato o un'automazione complessa? Ti rispondiamo entro 24 ore.</p>
-
-                <form action="https://api.web3forms.com/submit" method="POST"
-                    class="grid grid-cols-1 md:grid-cols-2 gap-5 relative z-10">
-                    <input type="hidden" name="access_key" value="9013a8d5-0901-42a0-b9e6-4c45553f960d">
-                    <input type="hidden" name="subject"    value="Nuovo Contatto da NexusAI Landing">
-                    <input type="hidden" name="redirect"   value="https://nexus.rmstudio.app/">
-
-                    <div>
-                        <label class="block text-xs text-zinc-300 mb-2 uppercase tracking-widest font-black">Il tuo Nome</label>
-                        <input type="text" name="name" required
-                            class="w-full bg-black/50 border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-brandCyan transition-colors text-sm"
-                            placeholder="Riccardo Modena">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-zinc-300 mb-2 uppercase tracking-widest font-black">La tua Email</label>
-                        <input type="email" name="email" required
-                            class="w-full bg-black/50 border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-brandCyan transition-colors text-sm"
-                            placeholder="nome@azienda.com">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-xs text-zinc-300 mb-2 uppercase tracking-widest font-black">Messaggio</label>
-                        <textarea name="message" required rows="4"
-                            class="w-full bg-black/50 border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-brandCyan transition-colors resize-none text-sm"
-                            placeholder="Descrivi il processo che vuoi automatizzare..."></textarea>
-                    </div>
-                    <div class="md:col-span-2">
-                        <button type="submit"
-                            class="w-full bg-white text-black font-black py-4 rounded-xl hover:bg-slate-100 transition-all active:scale-95 text-sm uppercase tracking-widest">
-                            Invia Messaggio
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Footer -->
-    <footer class="border-t border-white/10 bg-black py-16 px-6 relative z-10">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10 text-center md:text-left">
-            <div class="max-w-xs">
-                <div class="flex items-center justify-center md:justify-start gap-3 text-white font-black text-xl mb-3">
-                    <img src="logo_nexus_bg.png" alt="Logo" class="h-9 w-auto object-contain animate-pulse">
-                    <span class="font-mono text-white">Nexus<span class="text-brandCyan italic">AI</span></span>
-                </div>
-                <p class="text-zinc-500 text-xs leading-relaxed">Ingegneria dei Sistemi Autonomi.<br>Sviluppato da RM Studio.</p>
-                <p class="text-zinc-700 text-[10px] mt-5">© 2026 RM Studio. Tutti i diritti riservati.</p>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1.5">Nome dell'attività</label>
+                <input type="text" id="input-name" required 
+                    class="w-full bg-black border border-[#222] text-white rounded-lg px-4 py-3 text-sm outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/30 transition duration-200" 
+                    placeholder="es. Hotel Milano, Studio Rossi">
             </div>
 
-            <div class="flex flex-col items-center md:items-start gap-3">
-                <h4 class="text-white font-black text-[9px] uppercase tracking-widest mb-1">Social Hub</h4>
-                <div class="flex gap-3">
-                    <a href="https://www.instagram.com/riccardo_mode_/" target="_blank"
-                        class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-zinc-500 hover:text-white hover:border-brandCyan/50 transition-all text-xs font-bold">IG</a>
-                    <a href="https://www.facebook.com/riccardo.modena.792" target="_blank"
-                        class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-zinc-500 hover:text-white hover:border-brandCyan/50 transition-all text-xs font-bold">FB</a>
-                    <a href="https://www.linkedin.com/in/riccardo-modena-13918a61/" target="_blank"
-                        class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-zinc-500 hover:text-white hover:border-brandCyan/50 transition-all text-xs font-bold">IN</a>
-                    <a href="https://www.tiktok.com/@mr3d.riccardo" target="_blank"
-                        class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-zinc-500 hover:text-white hover:border-brandCyan/50 transition-all text-xs font-bold">TK</a>
-                </div>
-            </div>
+            <button type="submit" id="submit-btn" class="w-full bg-white text-black font-bold py-3.5 rounded-lg text-sm hover:bg-neutral-200 active:scale-[0.98] transition duration-200 mt-2 flex items-center justify-center gap-2">
+                Genera Anteprima Gratuita
+            </button>
+        </form>
 
-            <div class="flex flex-col items-center md:items-end gap-2 text-center md:text-right">
-                <h4 class="text-white font-black text-[9px] uppercase tracking-widest mb-3">Supporto</h4>
-                <a href="#contatti"
-                    class="bg-white/8 hover:bg-white/15 border border-white/15 text-white px-6 py-2 rounded-full text-xs font-bold transition-all">
-                    Parla con noi
+        <!-- Schermata di caricamento (Nascosta di default) -->
+        <div id="loading-box" class="hidden absolute inset-0 bg-black/95 z-20 flex flex-col items-center justify-center p-8 text-center">
+            <div class="w-12 h-12 border-2 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin mb-6"></div>
+            <h3 class="text-lg font-semibold text-white mb-2" id="loading-status">Analisi del sito in corso...</h3>
+            <p class="text-xs text-neutral-400 max-w-xs leading-relaxed" id="loading-subtext">Stiamo leggendo le pagine pubbliche per comprendere i tuoi servizi e configurare l'assistente ideale.</p>
+        </div>
+
+        <!-- Box Risultato (Nascosto di default) -->
+        <div id="result-box" class="mt-6 pt-6 border-t border-[#1a1a1a] hidden relative z-10">
+            <div class="p-4 bg-neutral-900/50 rounded-lg border border-neutral-800/60 mb-4">
+                <p class="text-xs text-neutral-300 font-medium mb-1">Il tuo assistente è pronto per il test!</p>
+                <p class="text-[11px] text-neutral-500 leading-relaxed">Usa il link sottostante per visualizzare l'anteprima interattiva direttamente sovrapposta al tuo sito web.</p>
+            </div>
+            
+            <label class="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1.5">Link di Anteprima</label>
+            <div class="flex gap-2">
+                <input type="text" id="generated-url" readonly 
+                    class="flex-1 bg-black border border-[#222] text-cyan-400 rounded-lg px-3 py-2.5 text-xs outline-none select-all font-mono">
+                <button onclick="copyLink()" class="bg-neutral-800 hover:bg-neutral-700 text-white text-xs px-4 rounded-lg font-medium transition duration-200">
+                    Copia
+                </button>
+            </div>
+            <div class="mt-4 flex justify-center">
+                <a id="preview-anchor" href="#" target="_blank" class="text-xs text-cyan-400 hover:text-cyan-300 font-medium underline flex items-center gap-1">
+                    Apri anteprima in una nuova scheda &rarr;
                 </a>
             </div>
         </div>
-    </footer>
-
-    <!-- ═══════════════════════════════════════════════
-         CHATBOT — n8n webhook + quick replies + border cangiante
-         ═══════════════════════════════════════════════ -->
-    <div id="nx-bubble" class="animated-rainbow-border" role="button" aria-label="Apri chat">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff"
-             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-        </svg>
     </div>
 
-    <!-- Bot Finestra con Bordo Cangiante Attivo -->
-    <div id="nx-window" class="animated-rainbow-border">
-        <div class="nx-header">
-            <div style="display:flex;align-items:center;gap:12px;">
-                <div style="width:28px;height:28px;position:relative;">
-                    <!-- Avatar dinamico con dissolvenza morbida -->
-                    <img id="nx-avatar" src="logo_nexus_bg.png" style="width:28px;height:28px;object-fit:contain;transition:opacity 0.3s;" alt="NexusAI">
-                </div>
-                <div style="display:flex;flex-direction:column;">
-                    <span style="font-size:13px;font-weight:800;letter-spacing:1px;font-family:'Space Mono',monospace;color:#fff;">NexusAI Pilot</span>
-                    <span style="font-size:10px;color:var(--green);font-weight:600;letter-spacing:.03em;">● Attivo e online</span>
-                </div>
-            </div>
-            <button id="nx-close-btn" style="background:none;border:none;color:#fff;opacity:.4;font-size:24px;cursor:pointer;line-height:1;padding:4px;" aria-label="Chiudi">&times;</button>
-        </div>
-
-        <div id="nx-messages" class="nx-messages"></div>
-
-        <!-- Quick replies slot -->
-        <div id="nx-quick-replies" class="nx-quick-replies"></div>
-
-        <div class="nx-input-area">
-            <input type="text" id="nx-input" placeholder="Scrivi o scegli una domanda…" autocomplete="off">
-            <button id="nx-send-btn">Invia</button>
-        </div>
+    <!-- Footer -->
+    <div class="text-center text-[10px] text-neutral-600 mt-6">
+        <p>&copy; 2026 NexusAI. Tutti i diritti riservati.</p>
     </div>
 
-    <!-- ════ SCRIPTS ════ -->
     <script>
-    /* ─── Config ─── */
-    const WEBHOOK_CHATBOT = 'https://n8n.rmstudio.app/webhook/chatbot-builder';
-    const SESSION_KEY     = 'nexus_chat_session';
+        const STEPS = [
+            { status: "Analisi del sito in corso...", sub: "Leggiamo i contenuti pubblici del sito web per comprendere i tuoi servizi." },
+            { status: "Generazione delle regole di comportamento...", sub: "L'intelligenza artificiale sta definendo il tono e le risposte del bot." },
+            { status: "Estrazione dell'identità visiva...", sub: "Rileviamo i colori principali per adattare graficamente l'interfaccia." },
+            { status: "Ottimizzazione finale...", sub: "Configuriamo la sessione temporanea per il tuo test." }
+        ];
 
-    let chatSessionId = sessionStorage.getItem(SESSION_KEY);
-    if (!chatSessionId) {
-        chatSessionId = 'nx_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-        sessionStorage.setItem(SESSION_KEY, chatSessionId);
-    }
-
-    // Forza il bot ad essere aperto di default su PC e Tablet, chiuso su Mobile
-    let chatIsOpen = window.innerWidth > 768;
-
-    /* Quick replies predefinite */
-    const QUICK_REPLIES = [
-        { label: '💬 Come funziona?',           text: 'Come funziona NexusAI concretamente?' },
-        { label: '💰 Quanto costa?',             text: 'Quali sono i prezzi e i piani disponibili?' },
-        { label: '⚡ Quanto ci vuole?',          text: 'Quanto tempo ci vuole per attivare il chatbot?' },
-    ];
-
-    /* Sequenza di benvenuto con timing reale spaziato a 2 secondi */
-    const WELCOME_SEQUENCE = [
-        { text: 'Benvenuto nel futuro della conversione. ⚡' },
-        { text: 'Sono <b>NexusAI</b>: il tuo agente commerciale autonomo.' },
-        { text: 'Posso essere installato su <b>qualsiasi sito</b> in meno di 10 secondi.' },
-        { text: 'Cosa vuoi scoprire oggi? Scegli una domanda qui sotto o scrivimi. 👇' }
-    ];
-
-    /* Rotazione degli avatar del chatbot */
-    const AVATARS = [
-        "logo_nexus_bg.png",
-        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=100&q=80", // Ragazza
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&h=100&q=80", // Ragazzo
-        "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=100&h=100&q=80"  // Robot
-    ];
-    let currentAvatarIndex = 0;
-
-    function startAvatarCycle() {
-        const avatarImg = document.getElementById('nx-avatar');
-        if (!avatarImg) return;
-        
-        setInterval(() => {
-            currentAvatarIndex = (currentAvatarIndex + 1) % AVATARS.length;
-            avatarImg.style.opacity = '0';
+        document.getElementById('generator-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const siteInput = document.getElementById('input-site').value.trim();
+            const nameInput = document.getElementById('input-name').value.trim();
             
-            setTimeout(() => {
-                avatarImg.src = AVATARS[currentAvatarIndex];
-                avatarImg.style.opacity = '1';
-            }, 300);
-        }, 4000);
-    }
+            const submitBtn = document.getElementById('submit-btn');
+            const loadingBox = document.getElementById('loading-box');
+            const resultBox = document.getElementById('result-box');
+            const statusText = document.getElementById('loading-status');
+            const subText = document.getElementById('loading-subtext');
 
-    /* Riferimenti DOM */
-    const win      = document.getElementById('nx-window');
-    const bubble   = document.getElementById('nx-bubble');
-    const closeBtn = document.getElementById('nx-close-btn');
-    const msgBox   = document.getElementById('nx-messages');
-    const input    = document.getElementById('nx-input');
-    const sendBtn  = document.getElementById('nx-send-btn');
-    const qrBox    = document.getElementById('nx-quick-replies');
-
-    function toggleChat() {
-        chatIsOpen = !chatIsOpen;
-        if (chatIsOpen) {
-            win.style.display = 'flex';
-            win.classList.add('open');
-        } else {
-            win.style.display = 'none';
-            win.classList.remove('open');
-        }
-    }
-
-    // Registrazione eventi click
-    bubble.addEventListener('click', toggleChat);
-    closeBtn.addEventListener('click', toggleChat);
-    sendBtn.addEventListener('click', () => {
-        const txt = input.value.trim();
-        if (!txt) return;
-        sendNxMsg(txt);
-    });
-    input.addEventListener('keydown', e => {
-        if (e.key === 'Enter') {
-            const txt = input.value.trim();
-            if (txt) sendNxMsg(txt);
-        }
-    });
-
-    /* Avvio automatico all'avvio della pagina */
-    document.addEventListener('DOMContentLoaded', () => {
-        startAvatarCycle();
-        if (chatIsOpen) {
-            win.style.display = 'flex';
-            win.classList.add('open');
-            startWelcomeSequence();
-        }
-    });
-
-    /* Welcome sequence sequenziale e distanziata */
-    function startWelcomeSequence() {
-        let i = 0;
-        function showNext() {
-            if (i >= WELCOME_SEQUENCE.length) {
-                renderQuickReplies();
-                return;
-            }
-            const msg = WELCOME_SEQUENCE[i];
-            const dotId = 'typing-seq-' + i;
+            // Avvia l'interfaccia di caricamento
+            resultBox.classList.add('hidden');
+            loadingBox.classList.remove('hidden');
             
-            addMsg('<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>', 'bot', dotId);
-            
-            setTimeout(() => {
-                const el = document.getElementById(dotId);
-                if (el) el.remove();
-                addMsg(msg.text, 'bot');
-                i++;
-                setTimeout(showNext, 2200);
-            }, 1000);
-        }
-        showNext();
-    }
-
-    /* Rendering risposte rapide */
-    function renderQuickReplies() {
-        qrBox.innerHTML = '';
-        QUICK_REPLIES.forEach(({ label, text }) => {
-            const btn = document.createElement('button');
-            btn.className = 'nx-qr';
-            btn.textContent = label;
-            btn.addEventListener('click', () => {
-                qrBox.innerHTML = ''; 
-                sendNxMsg(text);
-            });
-            qrBox.appendChild(btn);
-        });
-    }
-
-    /* Invio messaggio unificato */
-    async function sendNxMsg(textOverride) {
-        const text = (textOverride || input.value).trim();
-        if (!text) return;
-
-        input.value = '';
-        qrBox.innerHTML = ''; 
-        addMsg(text, 'user');
-
-        const loadId = 'typing-send-' + Date.now();
-        addMsg('<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>', 'bot', loadId);
-
-        try {
-            const res = await fetch(WEBHOOK_CHATBOT, {
-                method:  'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body:    JSON.stringify({
-                    message:     text,
-                    sessionId:   chatSessionId,
-                    strutturaId: 'nexus_landing'
-                }),
-                signal: AbortSignal.timeout(15000)
-            });
-
-            const raw = await res.text();
-            let reply = 'Nessuna risposta ricevuta.';
-
-            if (raw && raw.trim()) {
-                try {
-                    const data = JSON.parse(raw);
-                    reply = data.response || data.output || data.text || reply;
-                } catch (_) {
-                    reply = raw;
+            let stepIndex = 0;
+            const stepInterval = setInterval(() => {
+                if (stepIndex < STEPS.length) {
+                    statusText.innerText = STEPS[stepIndex].status;
+                    subText.innerText = STEPS[stepIndex].sub;
+                    stepIndex++;
                 }
+            }, 3000);
+
+            try {
+                // Chiamata all'API locale del server express
+                const response = await fetch('/api/generate-demo', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        site_url: siteInput,
+                        nome_struttura: nameInput
+                    })
+                });
+
+                const data = await response.json();
+                clearInterval(stepInterval);
+                loadingBox.classList.add('hidden');
+
+                if (data.success && data.demo_url) {
+                    document.getElementById('generated-url').value = data.demo_url;
+                    document.getElementById('preview-anchor').href = data.demo_url;
+                    resultBox.classList.remove('hidden');
+                } else {
+                    alert(data.error || "Si è verificato un errore durante la generazione dell'anteprima. Verifica che l'indirizzo sia corretto e pubblico.");
+                }
+
+            } catch (err) {
+                clearInterval(stepInterval);
+                loadingBox.classList.add('hidden');
+                alert("Errore di rete. Controlla la tua connessione e riprova.");
             }
+        });
 
-            const el = document.getElementById(loadId);
-            if (el) el.remove();
-            addMsg(reply, 'bot');
-
-        } catch (err) {
-            const el = document.getElementById(loadId);
-            if (el) el.remove();
-            addMsg('Connessione non riuscita. Riprova tra un momento.', 'bot');
+        function copyLink() {
+            const copyText = document.getElementById('generated-url');
+            copyText.select();
+            navigator.clipboard.writeText(copyText.value);
+            alert('Link di anteprima copiato negli appunti!');
         }
-    }
-
-    /* Aggiunta messaggio all'interfaccia */
-    function addMsg(html, sender, id) {
-        const div = document.createElement('div');
-        div.className = 'nx-msg ' + sender;
-        if (id) div.id = id;
-        div.innerHTML = html
-            .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-            .replace(/\n/g, '<br>');
-        msgBox.appendChild(div);
-        msgBox.scrollTo({ top: msgBox.scrollHeight, behavior: 'smooth' });
-    }
-
-    /* Simulatore di conversazione interattivo nella pagina */
-    const SIM_RESPONSES = {
-        prezzi: {
-            user: "Come gestisci i prezzi?",
-            bot: "NexusAI costa solo <b>49€/mese</b> per il piano Standard. Questo include un bot, la scansione automatica fino a 10 pagine del tuo sito e la personalizzazione grafica totale."
-        },
-        attivazione: {
-            user: "È difficile da attivare?",
-            bot: "Zero complicazioni. Ti forniamo un **tag HTML di una sola riga** da copiare e incollare prima del tag di chiusura body. Funziona immediatamente su WordPress, Shopify o Webflow."
-        },
-        sicurezza: {
-            user: "I dati sono al sicuro?",
-            bot: "Sì. Tutta l'infrastruttura di hosting e database risiede sui server ultra-sicuri ed europei di **Hetzner** e **Supabase**, garantendo il rispetto della privacy e del GDPR."
-        }
-    };
-
-    function triggerSim(key) {
-        const simBox = document.getElementById('sim-messages');
-        const data = SIM_RESPONSES[key];
-        if (!data) return;
-
-        simBox.innerHTML = `<div class="nx-msg user">${data.user}</div>`;
-        
-        const loadingId = 'sim-loading';
-        const loadDiv = document.createElement('div');
-        loadDiv.className = 'nx-msg bot';
-        loadDiv.id = loadingId;
-        loadDiv.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
-        simBox.appendChild(loadDiv);
-        simBox.scrollTop = simBox.scrollHeight;
-
-        setTimeout(() => {
-            const el = document.getElementById(loadingId);
-            if (el) el.remove();
-
-            const botDiv = document.createElement('div');
-            botDiv.className = 'nx-msg bot';
-            botDiv.innerHTML = data.bot;
-            simBox.appendChild(botDiv);
-            simBox.scrollTop = simBox.scrollHeight;
-        }, 1200);
-    }
-
-    /* Generazione della Demo con chiamata API asincrona reale */
-    async function generateDemo() {
-        const urlRaw = document.getElementById('site-url').value.trim();
-        if (!urlRaw) { document.getElementById('site-url').focus(); return; }
-
-        let url = urlRaw;
-        if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
-
-        const botId = 'demo_' + Math.random().toString(36).slice(2, 9);
-        const submitBtn = document.querySelector('#demo button');
-        const originalText = submitBtn.textContent;
-        
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Analisi e addestramento AI (può richiedere 15s)...';
-
-        try {
-            const res = await fetch('https://n8n.rmstudio.app/webhook/chatbot-creator', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    site_url: url,
-                    bot_id: botId,
-                    nome_struttura: 'Demo Client',
-                    is_paid: false 
-                })
-            });
-            
-            const data = await res.json();
-            
-            if (data.success && data.demo_url) {
-                const linkEl = document.getElementById('demo-link');
-                const resultDiv = document.getElementById('demo-result');
-                
-                linkEl.href = data.demo_url;
-                linkEl.textContent = data.demo_url;
-                resultDiv.classList.remove('hidden');
-            } else {
-                alert("Errore nell'analisi del sito. Riprova tra qualche istante.");
-            }
-        } catch(e) {
-            console.error(e);
-            alert("Il server sta completando l'analisi. Se il link non compare, attendi 5 secondi e riprova.");
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = originalText;
-        }
-    }
-
-    /* Contatore visite attive (Social Proof) */
-    (function () {
-        const el = document.getElementById('live-count');
-        if (!el) return;
-        setInterval(() => {
-            const delta = Math.floor(Math.random() * 3) - 1; 
-            const next  = Math.max(230, parseInt(el.textContent) + delta);
-            el.textContent = next;
-        }, 4000);
-    })();
     </script>
-
 </body>
 </html>
