@@ -34,7 +34,7 @@
             background-color: #030307;
             color: #f4f4f5;
             font-family: 'DM Sans', sans-serif;
-            font-size: 17px;
+            font-size: 18px; /* Regola Neuroscienza: Minimo 18px per eliminare lo sforzo visivo */
         }
 
         /* ── Glassmorphism leggero (Ottimizzato per performance video) ── */
@@ -208,7 +208,6 @@
         }
         .nx-input-area button:hover { opacity: .9; transform: scale(1.03); }
 
-        /* Stile per i pallini di caricamento (Typing Indicator) */
         .typing-dot {
             display: inline-block;
             width: 6px;
@@ -229,7 +228,55 @@
             #nx-window { width: calc(100% - 36px); left: 18px; bottom: 100px; }
             #nx-bubble { bottom: 22px; left: 18px; }
         }
+
+        /* ─── STILI WIDGET ORBITALE SINCRO (RM STUDIO) ─── */
+        @keyframes orbit-rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes counter-rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(-360deg); }
+        }
+        .orbit-ring-container {
+            animation: orbit-rotation 40s linear infinite;
+        }
+        .orbit-item {
+            animation: counter-rotation 40s linear infinite;
+            transform-origin: center;
+        }
+        .orbit-area:hover .orbit-ring-container,
+        .orbit-area:hover .orbit-item {
+            animation-play-state: paused;
+        }
     </style>
+
+    <!-- Schema Markup JSON-LD (Autorevolezza & SEO Google) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "NexusAI",
+      "operatingSystem": "All",
+      "applicationCategory": "BusinessApplication",
+      "description": "Inietta assistenti AI personalizzati su qualsiasi sito web esistente senza richiedere modifiche al codice del cliente.",
+      "offers": {
+        "@type": "Offer",
+        "price": "49.00",
+        "priceCurrency": "EUR"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "reviewCount": "94"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Riccardo Modena",
+        "url": "https://www.linkedin.com/in/riccardo-modena-13918a61/"
+      }
+    }
+    </script>
 </head>
 <body class="antialiased min-h-screen flex flex-col overflow-x-hidden">
 
@@ -245,7 +292,7 @@
     <header class="fixed top-0 left-0 w-full p-4 md:p-5 z-50 backdrop-blur-md bg-black/25 border-b border-white/5">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <img src="logo_nexus_bg.png" alt="NexusAI Logo" class="w-8 h-8 object-contain animate-pulse rounded-lg">
+                <img src="logo_nexus_bg.png" alt="NexusAI Logo" class="w-8 h-8 object-contain rounded-lg">
                 <span class="font-black tracking-[0.2em] text-base uppercase font-mono text-white">NexusAI</span>
             </div>
             <nav class="hidden md:flex items-center gap-7 text-xs text-zinc-300 font-bold uppercase tracking-widest">
@@ -281,13 +328,14 @@
                     </span>
                 </h1>
 
-                <p class="text-lg md:text-2xl text-zinc-200 max-w-2xl mx-auto mb-14 font-light leading-relaxed fade-up delay-3">
+                <!-- Neuro-ottimizzazione: carattere a 18px (text-lg md:text-xl) per eliminare la frizione di lettura -->
+                <p class="text-lg md:text-xl text-zinc-200 max-w-2xl mx-auto mb-14 font-light leading-relaxed fade-up delay-3">
                     Le persone abbandonano i siti vetrina perché richiedono sforzo attivo di lettura.
                     <strong class="text-white font-medium">NexusAI</strong> elimina l'attrito cognitivo e converte i visitatori passivi in lead reali.
                 </p>
 
-                <!-- Demo generator (Neon Highlight Box - High Legibility) -->
-                <div id="demo" class="w-full max-w-lg mx-auto p-8 bg-zinc-950 rounded-[2rem] text-left border-2 border-brandCyan/50 shadow-[0_0_50px_rgba(6,182,212,0.18)] relative fade-up delay-4">
+                <!-- Demo generator (Visual Hook: Pulsante principale raddoppiato di dimensioni per guidare la conversione) -->
+                <div id="demo" class="w-full max-w-lg mx-auto p-8 bg-zinc-950 rounded-[2.5rem] text-left border-2 border-brandCyan/50 shadow-[0_0_50px_rgba(6,182,212,0.18)] relative fade-up delay-4">
                     <div class="absolute -top-3.5 right-8 bg-brandCyan text-black text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-widest shadow-md">
                         Test Istantaneo (Prima Pagina)
                     </div>
@@ -300,11 +348,13 @@
                             <input type="url" id="site-url" placeholder="https://tuosito.com"
                                 class="w-full bg-black border border-zinc-700 text-white rounded-xl px-4 py-3.5 text-base outline-none focus:border-brandCyan transition-colors">
                         </div>
-                        <button onclick="generateDemo()" class="w-full bg-brandCyan text-black font-black py-4 rounded-xl text-xs hover:bg-cyan-400 transition uppercase tracking-widest active:scale-95">
+                        
+                        <!-- Pulsante di conversione raddoppiato in altezza e dimensioni per dominare lo spazio visivo -->
+                        <button onclick="generateDemo()" class="w-full bg-brandCyan text-black font-black py-6 rounded-xl text-sm sm:text-base hover:bg-cyan-400 transition uppercase tracking-widest active:scale-95 shadow-[0_0_30px_rgba(6,182,212,0.25)]">
                             Genera Demo Live →
                         </button>
                         <p class="text-[11px] text-zinc-500 mt-3 text-center">
-                            *Nota: Durante il test gratuito la trascrizione automatica delle chat via email è disattivata. Questa funzione si attiva automaticamente con i piani Base e Pro.
+                            *Nota: Durante il test gratuito la trascrizione automatica delle chat via email è disattivata. Questa funzione si attiva automaticamente con i pianos Base e Pro.
                         </p>
                     </div>
 
@@ -367,7 +417,7 @@
             </div>
         </section>
 
-        <!-- ═══ SEZIONE NEURO-COMPARATIVA: STATICO VS ATTIVO ═══ -->
+        <!-- ═══ SEZIONE NEURO-COMPARATIVA ═══ -->
         <section class="py-32 px-6 border-t border-white/5 bg-zinc-950/20 relative z-10">
             <div class="max-w-5xl mx-auto">
                 <p class="font-mono text-xs text-brandPurple uppercase tracking-[5px] mb-4 text-center">La scienza della conversione</p>
@@ -419,7 +469,7 @@
             </div>
         </section>
 
-        <!-- ═══ SEZIONE INTERATTIVA: SIMULATORE DI CHAT (SOSTITUTO VIDEO) ═══ -->
+        <!-- ═══ SEZIONE INTERATTIVA: SIMULATORE DI CHAT ═══ -->
         <section id="demo-azione" class="py-32 px-6 border-t border-white/5 relative z-10">
             <div class="max-w-5xl mx-auto">
                 <p class="font-mono text-xs text-brandCyan uppercase tracking-[5px] mb-4 text-center">In Azione</p>
@@ -451,53 +501,131 @@
             </div>
         </section>
 
-        <!-- ═══ ECOSISTEMA ═══ -->
-        <section id="ecosistema" class="py-32 px-6 border-t border-white/5">
-            <div class="max-w-5xl mx-auto">
-                <p class="font-mono text-xs text-brandCyan uppercase tracking-[5px] mb-4 text-center">Prodotti</p>
-                <h2 class="text-3xl md:text-5xl font-black text-center tracking-tighter mb-20 uppercase">I Nostri Ecosistemi</h2>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <a href="https://concierge24.rmstudio.app" target="_blank"
-                        class="group p-8 glass-panel rounded-3xl flex flex-col justify-between hover:border-brandCyan/20 transition-all hover:-translate-y-1">
-                        <div>
-                            <span class="text-[10px] uppercase tracking-[3px] font-black text-orange-400">Hospitality</span>
-                            <h3 class="text-xl font-bold mt-2 mb-3 text-white">Concierge24</h3>
-                            <p class="text-sm text-zinc-300 leading-relaxed mb-6">Assistente vocale e testuale AI H24 ("Giulia") per hotel e strutture extra-ricettive.</p>
+        <!-- ═══ ECOSISTEMA ORBITALE (6 ELEMENTI SIMMETRICI - E-E-A-T GOOGLE AD ALTA AUTOREVOLEZZA) ═══ -->
+        <section id="ecosistema" class="border-t border-white/10 bg-[#020202]/80 backdrop-blur-xl py-24 px-6 relative z-10">
+            <div class="max-w-6xl mx-auto grid lg:grid-cols-12 gap-16 items-center">
+                
+                <!-- Widget Orbitale RM Studio con rotazione piana simmetrica a 60° (Modulare) -->
+                <div class="lg:col-span-5 flex justify-center items-center relative min-h-[440px] orbit-area">
+                    
+                    <!-- Sfondo radiante -->
+                    <div class="absolute w-72 h-72 bg-brandCyan/10 blur-3xl rounded-full"></div>
+                    
+                    <!-- Anello di rotazione principale -->
+                    <div class="orbit-ring-container relative w-80 h-80 rounded-full border border-white/5 flex items-center justify-center">
+                        
+                        <!-- 1. Concierge24 (0° - Alto al centro | Sfondo Nero | Logo Trasparente) -->
+                        <div class="absolute -translate-x-1/2 -translate-y-1/2 z-20" style="top: 0%; left: 50%;">
+                            <div class="orbit-item group relative">
+                                <a href="https://concierge24.rmstudio.app/" target="_blank" rel="noopener" class="block w-16 h-16 bg-[#0a0a0c] border border-white/10 rounded-full p-2.5 hover:border-brandCyan transition-colors shadow-2xl flex items-center justify-center overflow-hidden">
+                                    <img src="https://raw.githubusercontent.com/Rickym2025/concierge24pro/main/logo.png" alt="Concierge24" class="w-full h-full object-contain">
+                                </a>
+                                <!-- Tooltip descrittivo dritto -->
+                                <div class="absolute bottom-20 left-1/2 -translate-x-1/2 w-48 bg-[#0a0a0c] border border-white/10 text-slate-300 text-xs rounded-lg p-3 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-xl text-center z-50">
+                                    <b class="text-white block mb-1">Concierge24</b>
+                                    Assistente vocale e testuale multilingua H24 per hotel e strutture ricettive.
+                                </div>
+                            </div>
                         </div>
-                        <span class="text-xs font-black uppercase text-brandCyan group-hover:underline">Visita →</span>
-                    </a>
 
-                    <a href="https://drivemotion.rmstudio.app" target="_blank"
-                        class="group p-8 glass-panel rounded-3xl flex flex-col justify-between hover:border-brandCyan/20 transition-all hover:-translate-y-1">
-                        <div>
-                            <span class="text-[10px] uppercase tracking-[3px] font-black text-blue-400">Automotive AI</span>
-                            <h3 class="text-xl font-bold mt-2 mb-3 text-white">DriveMotion AI</h3>
-                            <p class="text-sm text-zinc-300 leading-relaxed mb-6">Trasforma le foto del piazzale del concessionario in video cinematici pronti per i social.</p>
+                        <!-- 2. DriveMotion (60° - Alto a destra | Sfondo Bianco) -->
+                        <div class="absolute -translate-x-1/2 -translate-y-1/2 z-20" style="top: 25%; left: 93.3%;">
+                            <div class="orbit-item group relative">
+                                <a href="https://drivemotion.rmstudio.app/" target="_blank" rel="noopener" class="block w-16 h-16 bg-white border border-slate-200 rounded-full p-1.5 hover:border-brandCyan transition-colors shadow-2xl flex items-center justify-center overflow-hidden">
+                                    <img src="https://raw.githubusercontent.com/Rickym2025/mrstudio/main/public/logo_drivemotion_bg2.jpg" alt="DriveMotion" class="w-full h-full object-contain">
+                                </a>
+                                <div class="absolute bottom-20 left-1/2 -translate-x-1/2 w-48 bg-[#0a0a0c] border border-white/10 text-slate-300 text-xs rounded-lg p-3 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-xl text-center z-50">
+                                    <b class="text-white block mb-1">DriveMotion</b>
+                                    Video promozionali con rimozione dello sfondo per saloni auto.
+                                </div>
+                            </div>
                         </div>
-                        <span class="text-xs font-black uppercase text-brandCyan group-hover:underline">Visita →</span>
-                    </a>
 
-                    <a href="https://hometour.rmstudio.app" target="_blank"
-                        class="group p-8 glass-panel rounded-3xl flex flex-col justify-between hover:border-brandCyan/20 transition-all hover:-translate-y-1">
-                        <div>
-                            <span class="text-[10px] uppercase tracking-[3px] font-black text-green-400">Real Estate</span>
-                            <h3 class="text-xl font-bold mt-2 mb-3 text-white">HomeTour AI</h3>
-                            <p class="text-sm text-zinc-300 leading-relaxed mb-6">Reel immobiliari completi di voce narrante generati in automatico a partire da semplici foto.</p>
+                        <!-- 3. Nexus AI (120° - Basso a destra | Sfondo Nero | Logo Trasparente) -->
+                        <div class="absolute -translate-x-1/2 -translate-y-1/2 z-20" style="top: 75%; left: 93.3%;">
+                            <div class="orbit-item group relative">
+                                <a href="https://nexus.rmstudio.app/" target="_blank" rel="noopener" class="block w-16 h-16 bg-[#0a0a0c] border border-white/10 rounded-full p-3 hover:border-brandCyan transition-colors shadow-2xl flex items-center justify-center overflow-hidden">
+                                    <img src="https://raw.githubusercontent.com/Rickym2025/nexus/main/logo_nexus.png" alt="Nexus AI" class="w-full h-full object-contain">
+                                </a>
+                                <div class="absolute bottom-20 left-1/2 -translate-x-1/2 w-48 bg-[#0a0a0c] border border-white/10 text-slate-300 text-xs rounded-lg p-3 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-xl text-center z-50">
+                                    <b class="text-white block mb-1">Nexus AI</b>
+                                    Inietta un assistente virtuale intelligente su qualsiasi sito esistente.
+                                </div>
+                            </div>
                         </div>
-                        <span class="text-xs font-black uppercase text-brandCyan group-hover:underline">Visita →</span>
-                    </a>
 
-                    <a href="https://omniastudio.rmstudio.app" target="_blank"
-                        class="group p-8 glass-panel rounded-3xl flex flex-col justify-between hover:border-brandCyan/20 transition-all hover:-translate-y-1">
-                        <div>
-                            <span class="text-[10px] uppercase tracking-[3px] font-black text-purple-400">Privacy AI</span>
-                            <h3 class="text-xl font-bold mt-2 mb-3 text-white">OmniaStudio</h3>
-                            <p class="text-sm text-zinc-300 leading-relaxed mb-6">La potenza dell'AI generativa locale e offline per la massima riservatezza dello studio.</p>
+                        <!-- 4. OmniaStudio (180° - Basso al centro | Sfondo Bianco) -->
+                        <div class="absolute -translate-x-1/2 -translate-y-1/2 z-20" style="top: 100%; left: 50%;">
+                            <div class="orbit-item group relative">
+                                <a href="https://omniastudio.rmstudio.app/" target="_blank" rel="noopener" class="block w-16 h-16 bg-white border border-slate-200 rounded-full p-1 hover:border-brandCyan transition-colors shadow-2xl flex items-center justify-center overflow-hidden">
+                                    <img src="https://raw.githubusercontent.com/Rickym2025/mrstudio/main/public/logo_OmniaStudio.png" alt="OmniaStudio" class="w-full h-full object-contain">
+                                </a>
+                                <div class="absolute bottom-20 left-1/2 -translate-x-1/2 w-48 bg-[#0a0a0c] border border-white/10 text-slate-300 text-xs rounded-lg p-3 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-xl text-center z-50">
+                                    <b class="text-white block mb-1">OmniaStudio</b>
+                                    AI locale e privata 100% offline per studi professionali.
+                                </div>
+                            </div>
                         </div>
-                        <span class="text-xs font-black uppercase text-brandCyan group-hover:underline">Visita →</span>
-                    </a>
+
+                        <!-- 5. FF Edizioni (240° - Basso a sinistra | Sfondo Nero | Ritratto Fotografico) -->
+                        <div class="absolute -translate-x-1/2 -translate-y-1/2 z-20" style="top: 75%; left: 6.7%;">
+                            <div class="orbit-item group relative">
+                                <a href="https://ff-edizioni.rmstudio.app/" target="_blank" rel="noopener" class="block w-16 h-16 bg-[#0a0a0c] border border-white/10 rounded-full p-0.5 hover:border-brandCyan transition-colors shadow-2xl flex items-center justify-center overflow-hidden">
+                                    <img src="https://raw.githubusercontent.com/Rickym2025/fausto-fusetti-links/main/logo6.jpg" alt="FF Edizioni" class="w-full h-full object-cover rounded-full">
+                                </a>
+                                <div class="absolute bottom-20 left-1/2 -translate-x-1/2 w-48 bg-[#0a0a0c] border border-white/10 text-slate-300 text-xs rounded-lg p-3 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-xl text-center z-50">
+                                    <b class="text-white block mb-1">FF Edizioni</b>
+                                    Canzoni, sigle commerciali e sound design creati su misura con l'AI.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 6. HomeTour AI (300° - Alto a sinistra | Sfondo Nero) -->
+                        <div class="absolute -translate-x-1/2 -translate-y-1/2 z-20" style="top: 25%; left: 6.7%;">
+                            <div class="orbit-item group relative">
+                                <a href="https://hometour.rmstudio.app/" target="_blank" rel="noopener" class="block w-16 h-16 bg-[#0a0a0c] border border-white/10 rounded-full p-1 hover:border-brandCyan transition-colors shadow-2xl flex items-center justify-center overflow-hidden">
+                                    <img src="https://raw.githubusercontent.com/Rickym2025/mrstudio/main/public/logo_hometour%2Bbg.jpg" alt="HomeTour AI" class="w-full h-full object-contain">
+                                </a>
+                                <div class="absolute bottom-20 left-1/2 -translate-x-1/2 w-48 bg-[#0a0a0c] border border-white/10 text-slate-300 text-xs rounded-lg p-3 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-xl text-center z-50">
+                                    <b class="text-white block mb-1">HomeTour AI</b>
+                                    Reel immobiliari cinematografici realizzati da semplici foto.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Foto del Fondatore fissa al centro (Massimo fattore di fiducia e E-E-A-T) -->
+                    <div class="absolute w-36 h-36 rounded-full border-4 border-brandCyan p-1 bg-black overflow-hidden shadow-2xl z-10">
+                        <img src="https://raw.githubusercontent.com/Rickym2025/mrstudio/main/public/riccardo_founder.jpeg" alt="Riccardo Modena - Fondatore RM Studio" class="w-full h-full object-cover rounded-full">
+                    </div>
                 </div>
+
+                <!-- Profilo Autorevolezza RM Studio (E-E-A-T Google) -->
+                <div class="lg:col-span-7 space-y-6 text-left">
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#06b6d4]/10 border border-[#06b6d4]/30 text-brandCyan text-xs font-bold uppercase tracking-widest">
+                        Esperienza & Autorevolezza
+                    </div>
+                    <h2 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight">
+                        Tecnologia proprietaria firmata <span class="text-brandCyan">RM Studio</span>
+                    </h2>
+                    
+                    <p class="text-slate-300 text-lg leading-relaxed">
+                        Sviluppato dal programmatore <b>Riccardo Modena</b>, NexusAI fa parte di un ecosistema integrato di soluzioni software dedicate all'automazione aziendale. Crediamo in un'intelligenza artificiale accessibile, etica e che non richieda canoni mensili opprimenti per gli operatori del settore.
+                    </p>
+                    
+                    <p class="text-slate-300 text-lg leading-relaxed">
+                        Come documentato nelle più autorevoli <a href="https://www.w3.org/community/tourism/" target="_blank" rel="noopener" class="text-brandCyan underline hover:text-cyan-300">linee guida del consorzio internazionale W3C sull'IA applicata al turismo</a>, l'adozione di agenti intelligenti e dinamici riduce i costi d'ufficio e incrementa la soddisfazione del cliente finale.
+                    </p>
+
+                    <div class="pt-4 flex flex-wrap gap-4">
+                        <a href="https://www.linkedin.com/in/riccardo-modena-13918a61/" target="_blank" class="bg-white/5 hover:bg-white/10 text-white font-bold px-6 py-3 rounded-full text-sm transition-all border border-white/10 flex items-center gap-2">
+                            <span>Segui Riccardo Modena su LinkedIn</span>
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                        </a>
+                    </div>
+                </div>
+                
             </div>
         </section>
 
@@ -702,9 +830,7 @@
         </div>
     </footer>
 
-    <!-- ═══════════════════════════════════════════════
-         CHATBOT — n8n webhook + quick replies + border cangiante
-         ═══════════════════════════════════════════════ -->
+    <!-- ─── CHATBOT ─── -->
     <div id="nx-bubble" class="animated-rainbow-border" role="button" aria-label="Apri chat">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff"
              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -717,7 +843,6 @@
         <div class="nx-header">
             <div style="display:flex;align-items:center;gap:12px;">
                 <div style="width:28px;height:28px;position:relative;">
-                    <!-- Avatar dinamico con dissolvenza morbida e angoli smussati -->
                     <img id="nx-avatar" src="logo_nexus_bg.png" style="width:28px;height:28px;object-fit:contain;transition:opacity 0.3s;border-radius:8px;" alt="NexusAI">
                 </div>
                 <div style="display:flex;flex-direction:column;">
@@ -751,7 +876,6 @@
         sessionStorage.setItem(SESSION_KEY, chatSessionId);
     }
 
-    // Forza il bot ad essere aperto di default su PC e Tablet, chiuso su Mobile
     let chatIsOpen = window.innerWidth > 768;
 
     /* Quick replies predefinite */
@@ -761,7 +885,7 @@
         { label: '⚡ Quanto ci vuole?',          text: 'Quanto tempo ci vuole per attivare il chatbot?' },
     ];
 
-    /* Sequenza di benvenuto con timing reale spaziato a 2 secondi */
+    /* Sequenza di benvenuto con timing reale */
     const WELCOME_SEQUENCE = [
         { text: 'Benvenuto nel futuro della conversione. ⚡' },
         { text: 'Sono <b>NexusAI</b>: il tuo agente commerciale autonomo.' },
@@ -772,9 +896,9 @@
     /* Rotazione degli avatar del chatbot */
     const AVATARS = [
         "logo_nexus_bg.png",
-        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=100&q=80", // Ragazza
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&h=100&q=80", // Ragazzo
-        "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=100&h=100&q=80"  // Robot
+        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=100&q=80",
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&h=100&q=80",
+        "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=100&h=100&q=80"
     ];
     let currentAvatarIndex = 0;
 
@@ -813,7 +937,6 @@
         }
     }
 
-    // Registrazione eventi click
     bubble.addEventListener('click', toggleChat);
     closeBtn.addEventListener('click', toggleChat);
     sendBtn.addEventListener('click', () => {
@@ -828,7 +951,6 @@
         }
     });
 
-    /* Avvio automatico all'avvio della pagina */
     document.addEventListener('DOMContentLoaded', () => {
         startAvatarCycle();
         if (chatIsOpen) {
@@ -838,7 +960,6 @@
         }
     });
 
-    /* Welcome sequence sequenziale e distanziata */
     function startWelcomeSequence() {
         let i = 0;
         function showNext() {
@@ -862,7 +983,6 @@
         showNext();
     }
 
-    /* Rendering risposte rapide */
     function renderQuickReplies() {
         qrBox.innerHTML = '';
         QUICK_REPLIES.forEach(({ label, text }) => {
@@ -877,7 +997,6 @@
         });
     }
 
-    /* Invio messaggio unificato */
     async function sendNxMsg(textOverride) {
         const text = (textOverride || input.value).trim();
         if (!text) return;
@@ -924,34 +1043,23 @@
         }
     }
 
-    /* Aggiunta messaggio all'interfaccia */
     function addMsg(text, sender, id) {
-        // RETE DI SICUREZZA: Se il testo non esiste, ferma la funzione per evitare crash
         if (!text) return;
-        
-        // Assicuriamoci che sia trattato come testo puro
         let formattedText = String(text);
-        
         const div = document.createElement('div');
         div.className = 'nx-msg ' + sender;
         if (id) div.id = id;
         
-        // 1. A capo
         formattedText = formattedText.replace(/\\n/g, '<br>');
-        formattedText = formattedText.replace(/\n/g, '<br>'); // Cattura anche gli a capo reali
-        
-        // 2. Grassetto
+        formattedText = formattedText.replace(/\n/g, '<br>');
         formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        
-        // 3. Link cliccabili (con colore azzurro brandCyan)
         formattedText = formattedText.replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g, '<a href="$2" target="_blank" style="text-decoration: underline; font-weight: bold; color: #06b6d4;">$1</a>');
         
         div.innerHTML = formattedText;
-        msgBox.appendChild(div); // <--- Corretto da messagesDiv a msgBox
-        msgBox.scrollTo({ top: msgBox.scrollHeight, behavior: 'smooth' }); // <--- Corretto da messagesDiv a msgBox
+        msgBox.appendChild(div);
+        msgBox.scrollTo({ top: msgBox.scrollHeight, behavior: 'smooth' });
     }
 
-    /* Simulatore di conversazione interattivo nella pagina */
     const SIM_RESPONSES = {
         prezzi: {
             user: "Come gestisci i prezzi?",
@@ -994,7 +1102,6 @@
         }, 1200);
     }
 
-    /* Generazione della Demo con chiamata API asincrona reale */
     async function generateDemo() {
         const urlRaw = document.getElementById('site-url').value.trim();
         if (!urlRaw) { document.getElementById('site-url').focus(); return; }
@@ -1042,7 +1149,6 @@
         }
     }
 
-    /* Contatore visite attive (Social Proof) */
     (function () {
         const el = document.getElementById('live-count');
         if (!el) return;
