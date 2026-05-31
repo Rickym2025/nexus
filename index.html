@@ -2,6 +2,19 @@
 <html lang="it" class="scroll-smooth">
 <head>
 
+    <script>
+        (function() {
+            const userLang = navigator.language || navigator.userLanguage;
+            const lang = userLang.toLowerCase().split('-')[0];
+            
+            // Se la lingua del browser NON è l'italiano e l'utente non è già nella cartella /en/
+            if (lang !== 'it' && !window.location.pathname.includes('/en/')) {
+                // Reindirizza istantaneamente alla cartella inglese mantenendo i parametri URL (es. token, UTM)
+                window.location.replace('/en/' + window.location.search);
+            }
+        })();
+    </script>
+
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-EYRJ6XPTHE"></script>
     <script>
