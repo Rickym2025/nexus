@@ -392,20 +392,82 @@
         }
     </style>
 
-    <!-- Schema Markup JSON-LD (Autorevolezza & SEO Google) -->
-    <script type="application/ld+json">
+    <!-- Schema Strutturato Ottimizzato per AI, Google Universal Cart & AP2 -->
+    <script type="application/ld-json">
     {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       "name": "NexusAI",
       "operatingSystem": "All",
       "applicationCategory": "BusinessApplication",
-      "description": "Inietta assistenti AI personalizzati su qualsiasi sito web esistente senza richiedere modifiche al codice del cliente.",
+      "description": "Piattaforma B2B 'Shadow-Proxy' per l'iniezione asincrona di assistenti virtuali intelligenti su qualsiasi sito web esistente con una sola riga di codice, senza alterare l'infrastruttura originale.",
       "offers": {
-        "@type": "Offer",
-        "price": "49.00",
-        "priceCurrency": "EUR"
+        "@type": "AggregateOffer",
+        "priceCurrency": "EUR",
+        "lowPrice": "49.00",
+        "highPrice": "99.00",
+        "offerCount": "3",
+        "offers": [
+          {
+            "@type": "Offer",
+            "name": "Nexus Base",
+            "price": "49.00",
+            "priceCurrency": "EUR",
+            "description": "1 chatbot attivo sul sito, scansione fino a 10 pagine, messaggi e lead illimitati, allineamento estetico dei colori.",
+            "priceSpecification": {
+              "@type": "UnitPriceSpecification",
+              "referenceQuantity": {
+                "@type": "QuantitativeValue",
+                "value": "1",
+                "unitCode": "MONTH"
+              }
+            }
+          },
+          {
+            "@type": "Offer",
+            "name": "Nexus Pro (Consigliato)",
+            "price": "99.00",
+            "priceCurrency": "EUR",
+            "description": "Aggiunge la raccolta e gestione di prenotazioni dirette in chat e l'invio automatico delle trascrizioni e del riepilogo chat via email.",
+            "priceSpecification": {
+              "@type": "UnitPriceSpecification",
+              "referenceQuantity": {
+                "@type": "QuantitativeValue",
+                "value": "1",
+                "unitCode": "MONTH"
+              }
+            }
+          },
+          {
+            "@type": "Offer",
+            "name": "Agency Hub",
+            "price": "0.00",
+            "priceCurrency": "EUR",
+            "description": "Piano Enterprise multi-bot personalizzato con scansione profonda di file e PDF e integrazione API diretta nei CRM.",
+            "priceSpecification": {
+              "@type": "UnitPriceSpecification",
+              "priceType": "Custom pricing"
+            }
+          }
+        ]
       },
+      "additionalProperty": [
+        {
+          "@type": "PropertyValue",
+          "name": "installationType",
+          "value": "Single-line HTML Injection (Zero-code)"
+        },
+        {
+          "@type": "PropertyValue",
+          "name": "trackerImmunity",
+          "value": "Enabled (Using neutral tags to bypass Facebook/TikTok tracker conflicts)"
+        },
+        {
+          "@type": "PropertyValue",
+          "name": "scrollChainingBlock",
+          "value": "Enabled (Preventing host website page scrolling through widget wheel capture)"
+        }
+      ],
       "aggregateRating": {
         "@type": "AggregateRating",
         "ratingValue": "4.9",
@@ -418,6 +480,7 @@
       }
     }
     </script>
+    
 </head>
 <body class="antialiased min-h-screen flex flex-col overflow-x-hidden">
 
