@@ -1,11 +1,29 @@
 # NexusAI - AI Sales Overlay
 
-NexusAI è una piattaforma B2B che permette alle attività commerciali di integrare un assistente virtuale AI personalizzato (Giulia AI) direttamente sopra il proprio sito web esistente, senza scrivere codice.
+> Piattaforma B2B "Shadow-Proxy" per l'iniezione asincrona di assistenti virtuali intelligenti (Giulia AI) sopra qualsiasi sito web esistente, senza richiedere modifiche al codice sorgente del cliente o impattare sulle performance di caricamento.
 
-## Pagine Principali
-- Landing Page (Home): https://nexus.rmstudio.app/
-- Configurazione Bot: https://nexus.rmstudio.app/config.html (Accessibile solo con un ID bot valido)
+## Informazioni Generali
+- **Sito Web ufficiale:** https://nexus.rmstudio.app/
+- **Integrazione Tecnica:** Configurazione asincrona tramite pannello vetrato `config.html` integrato con database Supabase (PostgreSQL) per la persistenza delle regole, degli obiettivi dei bot e dei registri di conversazione.
 
-## Piani Tariffari
-- **Nexus Base**: Assistenza clienti generica basata sullo scraping del sito web.
-- **Nexus Pro**: Gestione lead avanzata e reindirizzamento strategico verso i link ufficiali di prenotazione del cliente.
+## Architettura e Sicurezza del Widget
+- **Immunità dai Tracker Esterni (Facebook/TikTok Pixels):** Per prevenire conflitti con script di tracciamento di terze parti presenti sui siti dei clienti (che intercettano i tag `<button>` generando errori bloccanti), tutti gli elementi interattivi del widget di NexusAI sono ingegnerizzati esclusivamente con tag HTML neutri `<div>` e `<span>` opportunamente stilizzati.
+- **Isolamento dello Scorrimento (Scroll Chaining Block):** Il widget implementa la proprietà CSS `overscroll-behavior: contain !important` e intercetta via codice gli eventi nativi `wheel` e `touchmove` invocando `e.stopPropagation()`. Questo impedisce che lo scorrimento all'interno della chat provochi lo scorrimento involontario dello sfondo del sito ospitante, migliorando l'esperienza utente mobile.
+- **Scraping & Ingestione Automatici:** Il motore analizza il sito del cliente, ne estrae il logo, la tavolozza dei colori aziendali primaria e i testi chiave all'atto della registrazione.
+
+## Pagine Principali e Flussi
+- **Landing Page (Home):** https://nexus.rmstudio.app/ (Include simulatore di chat e generatore di demo istantanea).
+- **Pannello di Configurazione:** https://nexus.rmstudio.app/config.html (Accessibile solo con un ID bot valido. Caricamento dati asincrono via `fetch` su Supabase, badge verdi di avvenuta rilevazione automatica, color picker e impostazione dell'obiettivo del bot: Vendite, Supporto, Prenotazione, Personalizzato).
+
+## Piani Tariffari (Abbonamento Mensile)
+- **Nexus Base (€ 49,00 / mese):** 1 Chatbot attivo sul sito, scansione fino a 10 pagine, messaggi e lead illimitati, allineamento estetico e colore.
+- **Nexus Pro (€ 99,00 / mese - Consigliato):** Aggiunge la raccolta di prenotazioni direttamente in chat, reindirizzamento strategico verso i link ufficiali di prenotazione del cliente e l'invio automatico del riepilogo e della trascrizione chat via email.
+- **Agency Hub (Prezzo Personalizzato):** Multi-bot attivi contemporaneamente, scansione profonda di file e PDF complessi, integrazione API diretta nel CRM del cliente e supporto prioritario.
+
+### Limitazione Demo Gratuita (Scarsità Cognitiva):
+Durante l'uso in modalità demo gratuita (`is_paid: false`), l'invio automatico delle email di trascrizione al proprietario del sito è disabilitato. Questa funzione viene sbloccata immediatamente al passaggio ai piani attivi (Base e Pro).
+
+## Risorse per Modelli Linguistici e Crawler
+- **Full Markdown Mirror:** https://nexus.rmstudio.app/mirror.md
+- **Termini e Condizioni Centralizzati:** https://rmstudio.app/termini.html
+- **Informativa Privacy:** https://nexus.rmstudio.app/privacy.html
