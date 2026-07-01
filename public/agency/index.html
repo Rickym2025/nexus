@@ -28,14 +28,36 @@
         </div>
     </div>
 
-    <script>
-        // Sostituisci questo valore con l'ID dell'agenzia loggata
-        // In produzione, puoi ricavarlo da Supabase Auth o da un login manuale
-        const AGENCY_ID = localStorage.getItem('partner_agency_id') || 'modena.riccardo@gmail.com'; 
+<script>
         const API_URL = 'https://api-creator.nexus.rmstudio.app'; // L'URL del tuo server Hetzner
 
-        document.getElementById('agency-badge').textContent = `Agenzia: ${AGENCY_ID}`;
+        // 1. Estrazione dinamica del parametro agency_id dall'URL
+        const urlParams = new URLSearchParams(window.location.search);
+        let AGENCY_ID = urlParams.get('agency_id');
 
+        if (AGENCY_ID) {
+            // Se presente nell'URL, lo salviamo in localStorage per gli accessi futuri
+            localStorage.setItem('partner_agency_id', AGENCY_ID);
+        } else {
+            // Altrimenti proviamo a recuperarlo dalla memoria locale del browser
+            AGENCY_ID = localStorage.getItem('partner_agency_id');
+        }
+
+        // 2. Se non troviamo nessun ID agenzia, blocchiamo la visualizzazione
+        if (!AGENCY_ID) {
+            document.getElementById('agency-badge').innerHTML = `<span class="text-red-400">ID Agenzia Mancante</span>`;
+            document.getElementById('bots-list').innerHTML = `
+                <div class="glass-panel p-8 rounded-2xl col-span-full text-center border-red-500/20">
+                    <p class="text-red-400 font-bold mb-2">Accesso non autorizzato ⚠️</p>
+                    <p class="text-zinc-400 text-sm">Per accedere alla tua area partner, utilizza il link personalizzato fornito dall'amministratore.</p>
+                </div>
+            `;
+        } else {
+            document.getElementById('agency-badge').textContent = `Agenzia: ${AGENCY_ID}`;
+            loadAgencyBots();
+        }
+
+        // 3. Funzione di caricamento dei bot associati all'agenzia
         async function loadAgencyBots() {
             const listContainer = document.getElementById('bots-list');
             
@@ -78,8 +100,6 @@
                 listContainer.innerHTML = `<p class="text-red-400 text-sm">Errore di caricamento. Verifica la connessione con il server.</p>`;
             }
         }
-
-        loadAgencyBots();
     </script>
 </body>
 </html>
