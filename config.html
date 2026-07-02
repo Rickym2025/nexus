@@ -130,28 +130,33 @@
         // Recupera i dati esistenti da Supabase per auto-compilare i campi
         async function loadCurrentConfig(id) {
             try {
+                // Recuperiamo i dati dall'API di Hetzner
                 const res = await fetch(`https://nexus-api.rmstudio.app/api/bot?bot_id=${id}`);
                 if (res.ok) {
-                    const data = await res.json();
-                    if (data) {
-                        if (data.nome_bot) document.getElementById('bot-name').value = data.nome_bot;
+                    const responseData = await res.json();
+                    
+                    // Spacchettiamo l'oggetto "bot" annidato restituito dal server
+                    if (responseData && responseData.success && responseData.bot) {
+                        const bot = responseData.bot; 
                         
-                        if (data.colore_hex) {
-                            const cleanColor = data.colore_hex.replace('#', '').trim();
+                        if (bot.nome_bot) document.getElementById('bot-name').value = bot.nome_bot;
+                        
+                        if (bot.colore_hex) {
+                            const cleanColor = bot.colore_hex.replace('#', '').trim();
                             document.getElementById('colore_hex').value = cleanColor;
                             document.getElementById('color-picker').value = '#' + cleanColor;
                             // Mostra il badge di avvenuto rilevamento
                             document.getElementById('color-badge').classList.remove('hidden');
                         }
                         
-                        if (data.logo_url) {
-                            document.getElementById('logo_url').value = data.logo_url;
+                        if (bot.logo_url) {
+                            document.getElementById('logo_url').value = bot.logo_url;
                             // Mostra il badge di avvenuto rilevamento
                             document.getElementById('logo-badge').classList.remove('hidden');
                         }
                         
-                        if (data.regole) document.getElementById('bot-rules').value = data.regole;
-                        if (data.obiettivo) document.getElementById('bot-goal').value = data.obiettivo;
+                        if (bot.regole) document.getElementById('bot-rules').value = bot.regole;
+                        if (bot.obiettivo) document.getElementById('bot-goal').value = bot.obiettivo;
                     }
                 }
             } catch (err) {
