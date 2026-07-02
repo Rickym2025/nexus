@@ -130,7 +130,7 @@
         // Recupera i dati esistenti da Supabase per auto-compilare i campi
         async function loadCurrentConfig(id) {
             try {
-                const res = await fetch(`https://n8n.rmstudio.app/webhook/nexus-config-get?bot_id=${id}`);
+                const res = await fetch(`https://nexus-api.rmstudio.app/api/bot?bot_id=${id}`);
                 if (res.ok) {
                     const data = await res.json();
                     if (data) {
