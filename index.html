@@ -38,8 +38,101 @@
     <style>
         body { background-color: #030307; color: #f4f4f5; font-family: 'DM Sans', sans-serif; font-size: 16px; }
         .glass-panel { backdrop-filter: blur(8px); background: rgba(10, 10, 15, 0.92); border: 1px solid rgba(255, 255, 255, 0.08); }
-        @keyframes border-rainbow { 0%, 100% { border-color: #06b6d4; } 33% { border-color: #8b5cf6; } 66% { border-color: #ec4899; } }
-        .animated-rainbow-border { border-width: 2px; box-shadow: 0 0 20px rgba(6, 182, 212, 0.25); animation: border-rainbow 8s infinite linear; }
+        /* --- PREMIUM ROTATING GLOW BORDER (CSS Houdini @property) --- */
+@property --glow-angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+}
+
+@keyframes spin-glow {
+    0% { --glow-angle: 0deg; }
+    100% { --glow-angle: 360deg; }
+}
+
+/* Classe Universale per Card, Finestre e Chat Bubble */
+.animated-rainbow-border,
+.rm-glow-card {
+    position: relative;
+    border: none !important; /* Rimuove vecchi bordi statici */
+}
+
+/* Bordo Sottile Rotante Razor-Sharp */
+.animated-rainbow-border::before,
+.rm-glow-card::before {
+    content: '';
+    position: absolute;
+    inset: -2px; /* Spessore del bordo (2px) */
+    border-radius: inherit;
+    padding: 2px;
+    background: conic-gradient(
+        from var(--glow-angle),
+        #06b6d4,
+        #8b5cf6,
+        #ec4899,
+        #06b6d4
+    );
+    -webkit-mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: spin-glow 3.5s linear infinite;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Alone Luminoso Soffuso Esterno (Aura Glow) */
+.animated-rainbow-border::after,
+.rm-glow-card::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: inherit;
+    background: conic-gradient(
+        from var(--glow-angle),
+        #06b6d4,
+        #8b5cf6,
+        #ec4899,
+        #06b6d4
+    );
+    filter: blur(14px);
+    opacity: 0.55;
+    animation: spin-glow 3.5s linear infinite;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Fix specifici per il Bubble e la Finestra Chat */
+#nx-bubble {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: #050508;
+    cursor: pointer;
+    z-index: 9998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#nx-window {
+    position: fixed;
+    bottom: 120px;
+    left: 30px;
+    width: 380px;
+    max-height: 600px;
+    background: rgba(6, 6, 9, 0.98);
+    backdrop-filter: blur(24px);
+    border-radius: 28px;
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.95);
+    z-index: 9998;
+    display: none;
+    flex-direction: column;
+}
         .ticker-wrap { overflow: hidden; }
         @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
         .ticker-track { display: flex; animation: ticker 25s linear infinite; white-space: nowrap; }
