@@ -39,23 +39,18 @@
         body { background-color: #030307; color: #f4f4f5; font-family: 'DM Sans', sans-serif; font-size: 16px; }
         .glass-panel { backdrop-filter: blur(8px); background: rgba(10, 10, 15, 0.92); border: 1px solid rgba(255, 255, 255, 0.08); }
         
-        /* --- PREMIUM ROTATING GLOW BORDER ANIMATO --- */
+        /* --- 1. ROTATING GLOW BORDER (RALLENTATO A 7.5s LUXURY SPEED) --- */
         @property --glow-angle {
             syntax: "<angle>";
             initial-value: 0deg;
-            inherits: true; /* Permette a ::before e ::after di ereditare la rotazione */
+            inherits: true;
         }
 
         @keyframes spin-glow {
-            from {
-                --glow-angle: 0deg;
-            }
-            to {
-                --glow-angle: 360deg;
-            }
+            from { --glow-angle: 0deg; }
+            to { --glow-angle: 360deg; }
         }
 
-        /* Classe Universale per Card, Finestre e Chat Bubble */
         .animated-rainbow-border,
         .rm-glow-card {
             position: relative;
@@ -73,10 +68,10 @@
             background: conic-gradient(
                 from var(--glow-angle),
                 transparent 0%,
-                transparent 50%,
-                #06b6d4 70%,
-                #8b5cf6 85%,
-                #ec4899 95%,
+                transparent 55%,
+                #06b6d4 75%,
+                #8b5cf6 88%,
+                #ec4899 96%,
                 #06b6d4 100%
             );
             -webkit-mask: 
@@ -84,12 +79,12 @@
                 linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
-            animation: spin-glow 3s linear infinite;
+            animation: spin-glow 7.5s linear infinite; /* Rallentato per effetto seta */
             pointer-events: none;
             z-index: 10;
         }
 
-        /* Scia Luminosa Soffusa Esterna (Aura Glow) */
+        /* Scia Luminosa Soffusa Esterna */
         .animated-rainbow-border::after,
         .rm-glow-card::after {
             content: '';
@@ -99,17 +94,30 @@
             background: conic-gradient(
                 from var(--glow-angle),
                 transparent 0%,
-                transparent 50%,
-                #06b6d4 70%,
-                #8b5cf6 85%,
-                #ec4899 95%,
+                transparent 55%,
+                #06b6d4 75%,
+                #8b5cf6 88%,
+                #ec4899 96%,
                 #06b6d4 100%
             );
             filter: blur(16px);
-            opacity: 0.8;
-            animation: spin-glow 3s linear infinite;
+            opacity: 0.7;
+            animation: spin-glow 7.5s linear infinite;
             pointer-events: none;
             z-index: -1;
+        }
+
+        /* --- 2. GLOW AMBIENTALE SOFFUSO PER LE CARD SECONDARIE --- */
+        .rm-subtle-card {
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.09) !important;
+            box-shadow: 0 10px 30px -10px rgba(6, 182, 212, 0.08), 0 0 20px -5px rgba(139, 92, 246, 0.05);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .rm-subtle-card:hover {
+            border-color: rgba(6, 182, 212, 0.35) !important;
+            box-shadow: 0 15px 40px -10px rgba(6, 182, 212, 0.22), 0 0 25px -5px rgba(236, 72, 153, 0.15);
+            transform: translateY(-2px);
         }
 
         /* Ticker */
@@ -212,7 +220,7 @@
                     Le persone abbandonano i siti vetrina perché richiedono sforzo attivo di lettura. <strong class="text-white">NexusAI</strong> elimina l'attrito cognitivo e converte i visitatori passivi in lead reali.
                 </p>
 
-                <!-- Demo Box con Rotating Glow -->
+                <!-- Demo Box: Eroe con Rotating Glow Laser (7.5s) -->
                 <div id="demo" class="w-full max-w-lg mx-auto p-8 bg-zinc-950 rounded-[2.5rem] text-left animated-rainbow-border relative">
                     <h3 class="text-xl font-bold text-white mb-2">Guarda l'AI impossessarsi del tuo sito</h3>
                     <p class="text-sm text-zinc-300 mb-6">Inserisci l'URL del tuo sito: lo analizziamo ed estraiamo le informazioni chiave.</p>
@@ -236,18 +244,18 @@
             </div>
         </div>
 
-        <!-- Simulator -->
+        <!-- Simulator: Con Glow Ambientale Soffuso -->
         <section id="demo-azione" class="py-24 px-6 border-t border-white/5">
             <div class="max-w-4xl mx-auto text-center">
                 <h2 class="text-3xl md:text-4xl font-black mb-4 uppercase">Simula una conversazione</h2>
-                <div class="max-w-2xl mx-auto bg-[#0a0a0f] border border-white/10 rounded-[2rem] overflow-hidden shadow-2xl mt-8">
+                <div class="max-w-2xl mx-auto bg-[#0a0a0f] rounded-[2rem] overflow-hidden mt-8 rm-subtle-card">
                     <div id="sim-messages" class="p-6 h-[260px] overflow-y-auto flex flex-col gap-4 bg-[#030306]">
                         <div class="nx-msg bot">Ciao! Fai clic su uno dei pulsanti sotto per simulare una richiesta reale. 👇</div>
                     </div>
                     <div class="p-4 bg-zinc-950 border-t border-white/5 flex flex-wrap gap-2 justify-center">
-                        <button onclick="triggerSim('prezzi')" class="bg-brandCyan/10 border border-brandCyan/30 text-brandCyan text-xs font-bold px-4 py-2 rounded-full cursor-pointer">Come gestisci i prezzi?</button>
-                        <button onclick="triggerSim('attivazione')" class="bg-brandPurple/10 border border-brandPurple/30 text-brandPurple text-xs font-bold px-4 py-2 rounded-full cursor-pointer">È difficile da attivare?</button>
-                        <button onclick="triggerSim('sicurezza')" class="bg-brandPink/10 border border-brandPink/30 text-brandPink text-xs font-bold px-4 py-2 rounded-full cursor-pointer">I dati sono al sicuro?</button>
+                        <button onclick="triggerSim('prezzi')" class="bg-brandCyan/10 border border-brandCyan/30 text-brandCyan text-xs font-bold px-4 py-2 rounded-full cursor-pointer hover:bg-brandCyan/20 transition">Come gestisci i prezzi?</button>
+                        <button onclick="triggerSim('attivazione')" class="bg-brandPurple/10 border border-brandPurple/30 text-brandPurple text-xs font-bold px-4 py-2 rounded-full cursor-pointer hover:bg-brandPurple/20 transition">È difficile da attivare?</button>
+                        <button onclick="triggerSim('sicurezza')" class="bg-brandPink/10 border border-brandPink/30 text-brandPink text-xs font-bold px-4 py-2 rounded-full cursor-pointer hover:bg-brandPink/20 transition">I dati sono al sicuro?</button>
                     </div>
                 </div>
             </div>
@@ -265,13 +273,14 @@
             </div>
         </section>
 
-        <!-- Pricing Section con Stripe On-The-Fly -->
+        <!-- Pricing Section -->
         <section id="pricing" class="py-24 px-6 border-t border-white/5">
             <div class="max-w-6xl mx-auto text-center">
                 <h2 class="text-3xl md:text-4xl font-black mb-4 uppercase">Piani e Prezzi Trasparenti</h2>
                 <div class="grid md:grid-cols-3 gap-7 max-w-5xl mx-auto text-left mt-12">
-                    <!-- Base Plan -->
-                    <div class="p-8 bg-zinc-950 rounded-3xl border border-zinc-800 flex flex-col justify-between">
+                    
+                    <!-- Base Plan: Con Glow Ambientale -->
+                    <div class="p-8 bg-zinc-950 rounded-3xl flex flex-col justify-between rm-subtle-card">
                         <div>
                             <h3 class="text-lg font-bold text-white">Base Plan</h3>
                             <div class="my-4 flex items-end gap-2"><span id="price-base-val" class="text-4xl font-black text-white">€49</span><span class="text-xs text-zinc-500 pb-1">/ mese</span></div>
@@ -279,44 +288,47 @@
                                 <li>✓ 1 Chatbot attivo</li><li>✓ Scansione 10 pagine</li><li>✓ Messaggi illimitati</li>
                             </ul>
                         </div>
-                        <button onclick="avviaCheckoutNexus('base')" class="block w-full text-center bg-white text-black font-black py-3.5 rounded-xl text-xs uppercase tracking-widest hover:bg-neutral-200 cursor-pointer">Attiva Base</button>
+                        <button onclick="avviaCheckoutNexus('base')" class="block w-full text-center bg-white text-black font-black py-3.5 rounded-xl text-xs uppercase tracking-widest hover:bg-neutral-200 cursor-pointer transition">Attiva Base</button>
                     </div>
 
-                    <!-- Nexus Pro con Rotating Glow -->
+                    <!-- Nexus Pro: EROE DEL PRICING con Rotating Glow Laser (7.5s) -->
                     <div class="p-8 bg-zinc-950 rounded-3xl flex flex-col justify-between shadow-lg animated-rainbow-border">
                         <div>
-                            <h3 class="text-lg font-bold text-white">Nexus Pro</h3>
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-lg font-bold text-white">Nexus Pro</h3>
+                                <span class="bg-brandCyan/20 text-brandCyan text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">Consigliato</span>
+                            </div>
                             <div class="my-4 flex items-end gap-2"><span id="price-pro-val" class="text-4xl font-black text-white">€99</span><span class="text-xs text-zinc-500 pb-1">/ mese</span></div>
                             <ul class="text-xs text-zinc-300 space-y-2 mb-6">
-                                <li>✓ 1 Chatbot attivo</li><li>✓ **Raccolta prenotazioni** in chat</li><li>✓ Riepilogo email</li>
+                                <li>✓ 1 Chatbot attivo</li><li>✓ <b>Raccolta prenotazioni</b> in chat</li><li>✓ Riepilogo email</li>
                             </ul>
                         </div>
-                        <button onclick="avviaCheckoutNexus('pro')" class="block w-full text-center bg-brandCyan text-black font-black py-3.5 rounded-xl text-xs uppercase tracking-widest hover:bg-cyan-400 cursor-pointer">Attiva Pro</button>
+                        <button onclick="avviaCheckoutNexus('pro')" class="block w-full text-center bg-brandCyan text-black font-black py-3.5 rounded-xl text-xs uppercase tracking-widest hover:bg-cyan-400 cursor-pointer transition">Attiva Pro</button>
                     </div>
 
-                    <!-- Agency Hub -->
-                    <div class="p-8 bg-zinc-950 rounded-3xl border border-zinc-800 flex flex-col justify-between">
+                    <!-- Agency Hub: Con Glow Ambientale -->
+                    <div class="p-8 bg-zinc-950 rounded-3xl flex flex-col justify-between rm-subtle-card">
                         <div>
                             <h3 class="text-lg font-bold text-white">Agency Hub</h3>
                             <div class="my-4 text-3xl font-black text-white">Personalizzato</div>
                             <p class="text-xs text-zinc-400 mb-6">Per agenzie con multi-bot e CRM dedicati.</p>
                         </div>
-                        <a href="#contatti" class="block w-full text-center bg-zinc-800 text-white font-black py-3.5 rounded-xl text-xs uppercase tracking-widest hover:bg-zinc-700">Contattaci</a>
+                        <a href="#contatti" class="block w-full text-center bg-zinc-800 text-white font-black py-3.5 rounded-xl text-xs uppercase tracking-widest hover:bg-zinc-700 transition">Contattaci</a>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Contatti -->
+        <!-- Contatti: Con Glow Ambientale Glass -->
         <section id="contatti" class="py-20 px-6 border-t border-white/5">
-            <div class="max-w-3xl mx-auto glass-panel p-8 rounded-3xl">
+            <div class="max-w-3xl mx-auto glass-panel p-8 rounded-3xl rm-subtle-card">
                 <h2 class="text-2xl font-bold mb-4">Contatta il Lab</h2>
                 <form action="https://api.web3forms.com/submit" method="POST" class="grid md:grid-cols-2 gap-4">
                     <input type="hidden" name="access_key" value="9013a8d5-0901-42a0-b9e6-4c45553f960d">
-                    <input type="text" name="name" required placeholder="Nome" class="bg-black border border-white/10 p-3 rounded-xl text-white text-sm">
-                    <input type="email" name="email" required placeholder="Email" class="bg-black border border-white/10 p-3 rounded-xl text-white text-sm">
-                    <textarea name="message" rows="3" required placeholder="Messaggio..." class="md:col-span-2 bg-black border border-white/10 p-3 rounded-xl text-white text-sm"></textarea>
-                    <button type="submit" class="md:col-span-2 bg-white text-black font-bold py-3 rounded-xl text-sm cursor-pointer">Invia Messaggio</button>
+                    <input type="text" name="name" required placeholder="Nome" class="bg-black border border-white/10 p-3 rounded-xl text-white text-sm focus:border-brandCyan outline-none">
+                    <input type="email" name="email" required placeholder="Email" class="bg-black border border-white/10 p-3 rounded-xl text-white text-sm focus:border-brandCyan outline-none">
+                    <textarea name="message" rows="3" required placeholder="Messaggio..." class="md:col-span-2 bg-black border border-white/10 p-3 rounded-xl text-white text-sm focus:border-brandCyan outline-none"></textarea>
+                    <button type="submit" class="md:col-span-2 bg-white text-black font-bold py-3 rounded-xl text-sm cursor-pointer hover:bg-neutral-200 transition">Invia Messaggio</button>
                 </form>
             </div>
         </section>
@@ -330,7 +342,7 @@
         </div>
     </footer>
 
-    <!-- Chatbot Widget con Rotating Glow -->
+    <!-- Chatbot Widget con Rotating Glow Laser (7.5s) -->
     <div id="nx-bubble" class="animated-rainbow-border"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
     <div id="nx-window" class="animated-rainbow-border">
         <div class="nx-header">
