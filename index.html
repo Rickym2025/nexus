@@ -39,16 +39,20 @@
         body { background-color: #030307; color: #f4f4f5; font-family: 'DM Sans', sans-serif; font-size: 16px; }
         .glass-panel { backdrop-filter: blur(8px); background: rgba(10, 10, 15, 0.92); border: 1px solid rgba(255, 255, 255, 0.08); }
         
-        /* --- PREMIUM ROTATING GLOW BORDER (CSS Houdini @property) --- */
+        /* --- PREMIUM ROTATING GLOW BORDER ANIMATO --- */
         @property --glow-angle {
             syntax: "<angle>";
             initial-value: 0deg;
-            inherits: false;
+            inherits: true; /* Permette a ::before e ::after di ereditare la rotazione */
         }
 
         @keyframes spin-glow {
-            0% { --glow-angle: 0deg; }
-            100% { --glow-angle: 360deg; }
+            from {
+                --glow-angle: 0deg;
+            }
+            to {
+                --glow-angle: 360deg;
+            }
         }
 
         /* Classe Universale per Card, Finestre e Chat Bubble */
@@ -58,7 +62,7 @@
             border: none !important;
         }
 
-        /* Bordo Sottile Rotante Razor-Sharp */
+        /* Fascio Laser Rotante Sottile */
         .animated-rainbow-border::before,
         .rm-glow-card::before {
             content: '';
@@ -68,38 +72,42 @@
             padding: 2px;
             background: conic-gradient(
                 from var(--glow-angle),
-                #06b6d4,
-                #8b5cf6,
-                #ec4899,
-                #06b6d4
+                transparent 0%,
+                transparent 50%,
+                #06b6d4 70%,
+                #8b5cf6 85%,
+                #ec4899 95%,
+                #06b6d4 100%
             );
             -webkit-mask: 
                 linear-gradient(#fff 0 0) content-box, 
                 linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
-            animation: spin-glow 3.5s linear infinite;
+            animation: spin-glow 3s linear infinite;
             pointer-events: none;
             z-index: 10;
         }
 
-        /* Alone Luminoso Soffuso Esterno (Aura Glow) */
+        /* Scia Luminosa Soffusa Esterna (Aura Glow) */
         .animated-rainbow-border::after,
         .rm-glow-card::after {
             content: '';
             position: absolute;
-            inset: -3px;
+            inset: -4px;
             border-radius: inherit;
             background: conic-gradient(
                 from var(--glow-angle),
-                #06b6d4,
-                #8b5cf6,
-                #ec4899,
-                #06b6d4
+                transparent 0%,
+                transparent 50%,
+                #06b6d4 70%,
+                #8b5cf6 85%,
+                #ec4899 95%,
+                #06b6d4 100%
             );
-            filter: blur(14px);
-            opacity: 0.6;
-            animation: spin-glow 3.5s linear infinite;
+            filter: blur(16px);
+            opacity: 0.8;
+            animation: spin-glow 3s linear infinite;
             pointer-events: none;
             z-index: -1;
         }
