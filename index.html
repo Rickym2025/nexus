@@ -1,15 +1,7 @@
 <!DOCTYPE html>
 <html lang="it" class="scroll-smooth">
 <head>
-    <script>
-        (function() {
-            const userLang = navigator.language || navigator.userLanguage;
-            const lang = userLang.toLowerCase().split('-')[0];
-            if (lang !== 'it' && !window.location.pathname.includes('/en/')) {
-                window.location.replace('/en/' + window.location.search);
-            }
-        })();
-    </script>
+    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-EYRJ6XPTHE"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -39,7 +31,7 @@
         body { background-color: #030307; color: #f4f4f5; font-family: 'DM Sans', sans-serif; font-size: 16px; }
         .glass-panel { backdrop-filter: blur(8px); background: rgba(10, 10, 15, 0.92); border: 1px solid rgba(255, 255, 255, 0.08); }
         
-        /* --- 1. ROTATING GLOW BORDER (RALLENTATO A 7.5s LUXURY SPEED) --- */
+        /* --- ROTATING GLOW BORDER (7.5s LUXURY SPEED) --- */
         @property --glow-angle {
             syntax: "<angle>";
             initial-value: 0deg;
@@ -57,7 +49,6 @@
             border: none !important;
         }
 
-        /* Fascio Laser Rotante Sottile */
         .animated-rainbow-border::before,
         .rm-glow-card::before {
             content: '';
@@ -79,12 +70,11 @@
                 linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
-            animation: spin-glow 7.5s linear infinite; /* Rallentato per effetto seta */
+            animation: spin-glow 7.5s linear infinite;
             pointer-events: none;
             z-index: 10;
         }
 
-        /* Scia Luminosa Soffusa Esterna */
         .animated-rainbow-border::after,
         .rm-glow-card::after {
             content: '';
@@ -107,7 +97,6 @@
             z-index: -1;
         }
 
-        /* --- 2. GLOW AMBIENTALE SOFFUSO PER LE CARD SECONDARIE --- */
         .rm-subtle-card {
             position: relative;
             border: 1px solid rgba(255, 255, 255, 0.09) !important;
@@ -120,12 +109,10 @@
             transform: translateY(-2px);
         }
 
-        /* Ticker */
         .ticker-wrap { overflow: hidden; }
         @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
         .ticker-track { display: flex; animation: ticker 25s linear infinite; white-space: nowrap; }
         
-        /* Chatbot Bubble & Window */
         #nx-bubble { 
             position: fixed; 
             bottom: 30px; 
@@ -279,7 +266,7 @@
                 <h2 class="text-3xl md:text-4xl font-black mb-4 uppercase">Piani e Prezzi Trasparenti</h2>
                 <div class="grid md:grid-cols-3 gap-7 max-w-5xl mx-auto text-left mt-12">
                     
-                    <!-- Base Plan: Con Glow Ambientale -->
+                    <!-- Base Plan -->
                     <div class="p-8 bg-zinc-950 rounded-3xl flex flex-col justify-between rm-subtle-card">
                         <div>
                             <h3 class="text-lg font-bold text-white">Base Plan</h3>
@@ -291,7 +278,7 @@
                         <button onclick="avviaCheckoutNexus('base')" class="block w-full text-center bg-white text-black font-black py-3.5 rounded-xl text-xs uppercase tracking-widest hover:bg-neutral-200 cursor-pointer transition">Attiva Base</button>
                     </div>
 
-                    <!-- Nexus Pro: EROE DEL PRICING con Rotating Glow Laser (7.5s) -->
+                    <!-- Nexus Pro: Eroe del Pricing -->
                     <div class="p-8 bg-zinc-950 rounded-3xl flex flex-col justify-between shadow-lg animated-rainbow-border">
                         <div>
                             <div class="flex justify-between items-center">
@@ -306,7 +293,7 @@
                         <button onclick="avviaCheckoutNexus('pro')" class="block w-full text-center bg-brandCyan text-black font-black py-3.5 rounded-xl text-xs uppercase tracking-widest hover:bg-cyan-400 cursor-pointer transition">Attiva Pro</button>
                     </div>
 
-                    <!-- Agency Hub: Con Glow Ambientale -->
+                    <!-- Agency Hub -->
                     <div class="p-8 bg-zinc-950 rounded-3xl flex flex-col justify-between rm-subtle-card">
                         <div>
                             <h3 class="text-lg font-bold text-white">Agency Hub</h3>
@@ -319,7 +306,7 @@
             </div>
         </section>
 
-        <!-- Contatti: Con Glow Ambientale Glass -->
+        <!-- Contatti -->
         <section id="contatti" class="py-20 px-6 border-t border-white/5">
             <div class="max-w-3xl mx-auto glass-panel p-8 rounded-3xl rm-subtle-card">
                 <h2 class="text-2xl font-bold mb-4">Contatta il Lab</h2>
@@ -342,7 +329,7 @@
         </div>
     </footer>
 
-    <!-- Chatbot Widget con Rotating Glow Laser (7.5s) -->
+    <!-- Chatbot Widget -->
     <div id="nx-bubble" class="animated-rainbow-border"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
     <div id="nx-window" class="animated-rainbow-border">
         <div class="nx-header">
@@ -366,7 +353,7 @@
       });
     </script>
 
-      <!-- Selettore Lingue Universale RM Studio -->
+    <!-- Selettore Lingue Universale RM Studio -->
     <script src="https://rmstudio.app/translate.js" defer></script>
 </body>
 </html>
